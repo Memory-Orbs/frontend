@@ -1,0 +1,46 @@
+.getStartedButton {
+  width: 250px;
+  display: inline-block;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: #1a1a1a; /* Koyu arka plan görseldeki gibi */
+  border: 2px solid #bc13fe; /* Mor çerçeve */
+  border-radius: 50px; /* Görseldeki oval yapı */
+  cursor: pointer;
+  outline: none;
+
+  /* İlk gölge (Neon efekti) */
+  box-shadow: 0 0 10px #bc13fe, inset 0 0 5px #bc13fe;
+
+  /* Animasyonu başlat */
+  animation: pulseGlow 2s infinite ease-in-out;
+  transition: all 0.3s ease;
+}
+
+/* Yanıp sönme efekti için animasyon */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px #bc13fe, inset 0 0 2px #bc13fe;
+    transform: scale(1);
+  }
+  50% {
+    /* Parlamanın en güçlü olduğu an */
+    box-shadow: 0 0 25px #bc13fe, 0 0 40px #bc13fe, inset 0 0 10px #bc13fe;
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 5px #bc13fe, inset 0 0 2px #bc13fe;
+    transform: scale(1);
+  }
+}
+
+/* Üzerine gelindiğinde daha canlı olsun */
+.getStartedButton:hover {
+  background-color: #bc13fe;
+  color: #fff;
+  box-shadow: 0 0 50px #bc13fe;
+}

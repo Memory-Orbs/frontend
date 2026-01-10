@@ -1,0 +1,12 @@
+.appContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 10px;
+  /* border: solid 20px #800080;  */
+  border-radius: 10%;
+  box-shadow: inset 0 0 40px 60px #80008080;
+}
+
