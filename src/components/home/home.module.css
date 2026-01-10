@@ -7,21 +7,13 @@
   color: #ffffff;
   text-decoration: none;
   text-transform: uppercase;
-  background-color: #2A0E4F; /* Koyu arka plan görseldeki gibi */
-  border: 2px solid #bc13fe; /* Mor çerçeve */
-  border-radius: 50px; /* Görseldeki oval yapı */
+  background-color: #2A0E4F; 
+  border: 2px solid #bc13fe; 
+  border-radius: 50px; 
   cursor: pointer;
   outline: none;
-
-  /* İlk gölge (Neon efekti) */
   box-shadow: 0 0 10px #bc13fe, inset 0 0 5px #bc13fe;
-
-
 }
-
-
-
-/* Üzerine gelindiğinde daha canlı olsun */
 .getStartedButton:hover {
   background-color: #bc13fe;
   color: #fff;
