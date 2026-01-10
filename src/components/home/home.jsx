@@ -13,9 +13,9 @@ function Home() {
           />
           <h1 className={css.logoText}>MEMORY ORBS</h1>
         </div>
-        <h1>DUYGULARINI GÖRSELLEŞTİR</h1>
+        <h1>VISUALIZE YOUR EMOTIONS</h1>
         <h2>
-          Memory Orbs, günlük duygu durumunu renkli anı kürelerine dönüştürür.
+          Memory Orbs transforms your daily emotional state into colorful memory spheres.
         </h2>
         <h2>HOW DO YOU FEEL TODAY?</h2>
         <Link to="/" className={css.getStartedButton}>
