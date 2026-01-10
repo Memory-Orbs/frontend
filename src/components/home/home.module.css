@@ -19,3 +19,12 @@
   color: #fff;
   box-shadow: 0 0 50px #bc13fe;
 }
+.logoContainer {
+  display: flex;
+  text-align: center;
+  margin-bottom: 30px;
+}
+.logo {
+  size: 50px;
+  width: 150px;
+}
