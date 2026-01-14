@@ -88,6 +88,12 @@ const LoginForm = () => {
         </Form>
       </Formik>
       <p className={css.registerText}>
+        Forgot your password?{" "}
+        <Link className={css.forgotLink} to="/forgot-password">
+          Reset here
+        </Link>
+      </p>
+      <p className={css.registerText}>
         Don't have an account?{" "}
         <Link className={css.registerLink} to="/register">
           Register here

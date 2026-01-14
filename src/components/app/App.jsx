@@ -7,6 +7,7 @@ import { selectIsRefreshing } from "../../redux/auth/selectors";
 
 const Home = lazy(() => import("../../pages/homePage/homePage.jsx"));
 const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage.jsx"));
+const RegisterPage = lazy(() => import("../../pages/registerPage/RegisterPage.jsx"));
 
 function App() {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </Suspense>
     </div>
