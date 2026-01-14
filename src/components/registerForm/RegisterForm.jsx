@@ -1,5 +1,5 @@
 import css from "./RegisterForm.module.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { registerUser } from "../../redux/auth/operations";
@@ -10,14 +10,6 @@ import { Link } from "react-router-dom";
 const RegisterForm = () => {
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  useEffect(() => {
-    if (isSubmitting) {
-      const timer = setTimeout(() => {
-        setIsSubmitting(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isSubmitting]);
 
   const initialValues = {
     name: "",
@@ -25,6 +17,7 @@ const RegisterForm = () => {
     email: "",
     password: "",
   };
+
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(2, "Name must be at least 2 characters")
@@ -39,44 +32,46 @@ const RegisterForm = () => {
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-  const handleSubmit = (values, { resetForm }) => {
+
+  const handleSubmit = async (values, { resetForm }) => {
     setIsSubmitting(true);
-    dispatch(registerUser(values))
-      .unwrap()
-      .then(() => {
-        toast.success("Registration successful!");
-        resetForm();
-      })
-      .catch(() => {
-        toast.error("Registration failed. Please try again.");
-      });
+    try {
+      await dispatch(registerUser(values)).unwrap();
+      toast.success("Registration successful!");
+      resetForm();
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
     <div className={css.registerFormContainer}>
       <h2 className={css.title}>Register</h2>
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         <Form className={css.registerForm}>
-          <label className={css.label} htmlFor="name">
+          <label className={css.label}>
             Name
             <Field
               className={css.input}
               type="text"
-              id="name"
               name="name"
               placeholder="Enter your name"
             />
             <ErrorMessage className={css.error} name="name" component="div" />
           </label>
-          <label className={css.label} htmlFor="surname">
+
+          <label className={css.label}>
             Surname
             <Field
               className={css.input}
               type="text"
-              id="surname"
               name="surname"
               placeholder="Enter your surname"
             />
@@ -86,23 +81,23 @@ const RegisterForm = () => {
               component="div"
             />
           </label>
-          <label className={css.label} htmlFor="email">
+
+          <label className={css.label}>
             Email
             <Field
               className={css.input}
               type="email"
-              id="email"
               name="email"
               placeholder="Enter your email"
             />
             <ErrorMessage className={css.error} name="email" component="div" />
           </label>
-          <label className={css.label} htmlFor="password">
+
+          <label className={css.label}>
             Password
             <Field
               className={css.input}
               type="password"
-              id="password"
               name="password"
               placeholder="Enter your password"
             />
@@ -112,6 +107,7 @@ const RegisterForm = () => {
               component="div"
             />
           </label>
+
           <button
             className={css.submitButton}
             type="submit"
@@ -121,6 +117,7 @@ const RegisterForm = () => {
           </button>
         </Form>
       </Formik>
+
       <p className={css.loginText}>
         Already have an account?{" "}
         <Link className={css.loginLink} to="/login">
@@ -130,4 +127,5 @@ const RegisterForm = () => {
     </div>
   );
 };
+
 export default RegisterForm;
