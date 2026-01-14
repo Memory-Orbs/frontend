@@ -18,7 +18,7 @@ function Home() {
           Memory Orbs transforms your daily emotional state into colorful memory spheres.
         </h2>
         <h2>HOW DO YOU FEEL TODAY?</h2>
-        <Link to="/" className={css.getStartedButton}>
+        <Link to="/login" className={css.getStartedButton}>
           GET STARTED
         </Link>
       </div>
