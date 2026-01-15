@@ -4,32 +4,40 @@ import css from "./forgotPassword.module.css";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { sendPasswordResetEmail } from "../../redux/auth/operations";
-import { selectIsPasswordResetSending } from "../../redux/auth/selectors";
+import {
+  selectPasswordResetMessage,
+  selectIsPasswordResetSending,
+} from "../../redux/auth/selectors";
 import toast from "react-hot-toast";
 
-const ForgotPasswordContent = () => {
+const ForgotPasswordContent = ({ setMode}) => {
   const dispatch = useDispatch();
   const [emailSent, setEmailSent] = useState(false);
   const isSending = useSelector(selectIsPasswordResetSending);
+  const message = useSelector(selectPasswordResetMessage);
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      await dispatch(sendPasswordResetEmail(values.email)).unwrap();
-      setEmailSent(true);
-      toast.success("E-posta başarıyla gönderildi!");
-    } catch (error) {
-      const errorMessage =
-        typeof error === "string"
-          ? error
-          : error?.message || "Şifre sıfırlama başarısız";
 
-      toast.error(errorMessage);
-      console.error("Forgot Password Error:", errorMessage);
-    } finally {
-      setSubmitting(false);
-    }
+    const handleSubmit = async (values, { setSubmitting }) => {
+      try {
+        const result = await dispatch(sendPasswordResetEmail(values.email));
+
+        if (result.meta.requestStatus === "fulfilled") {
+          setEmailSent(true);
+          toast.success("E-posta başarıyla gönderildi!");
+        } else {
+          // Eğer payload bir nesneyse içindeki mesajı al, değilse kendisini kullan
+          const errorToShow =
+            typeof result.payload === "string"
+              ? result.payload
+              : result.payload?.message || "E-posta gönderilemedi";
+
+          toast.error(errorToShow);
+        }
+      }  finally {
+        setSubmitting(false);
+      }
   };
-
+  
   return (
     <div className={css.container}>
       {emailSent ? (
@@ -47,7 +55,7 @@ const ForgotPasswordContent = () => {
           })}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, values }) => (
             <Form className={css.form}>
               <div className={css.field}>
                 <label htmlFor="email">E-posta Adresi</label>
@@ -58,6 +66,7 @@ const ForgotPasswordContent = () => {
                   className={css.error}
                 />
               </div>
+
               <button
                 type="submit"
                 className={css.button}

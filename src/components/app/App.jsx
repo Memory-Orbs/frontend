@@ -1,9 +1,8 @@
 import { lazy } from "react";
 import css from "./App.module.css";
-import { useDispatch, useSelector } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
-import { selectIsRefreshing } from "../../redux/auth/selectors";
 import { Toaster } from "react-hot-toast";
 
 
@@ -14,8 +13,8 @@ const ForgotPasswordPage = lazy(() => import("../../pages/forgotPassword/ForgotP
 const ResetPasswordPage = lazy(() => import("../../pages/forgotPassword/ResetPassword.jsx"));
 
 function App() {
-  const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.auth);
+  // const dispatch = useDispatch();
+  // const isLoggedIn = useSelector((state) => state.auth);
   // const isRefreshing = useSelector(selectIsRefreshing);
 
   return (
