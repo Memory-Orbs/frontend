@@ -18,11 +18,13 @@ const ForgotPasswordContent = () => {
       setEmailSent(true);
       toast.success("E-posta başarıyla gönderildi!");
     } catch (error) {
-      toast.error(
+      const errorMessage =
         typeof error === "string"
           ? error
-          : error?.message || "Şifre sıfırlama başarısız"
-      );
+          : error?.message || "Şifre sıfırlama başarısız";
+
+      toast.error(errorMessage);
+      console.error("Forgot Password Error:", errorMessage);
     } finally {
       setSubmitting(false);
     }

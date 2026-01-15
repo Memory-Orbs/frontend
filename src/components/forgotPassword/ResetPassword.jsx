@@ -54,7 +54,10 @@ export const ResetPasswordContent = () => {
         navigate("/");
       }, 800);
     } else {
-      toast.error(result.payload || "Şifre sıfırlama başarısız");
+      const errorMessage = typeof result.payload === 'string'
+        ? result.payload
+        : result.payload?.message || "Şifre sıfırlama başarısız";
+      toast.error(errorMessage);
     }
   };
 
