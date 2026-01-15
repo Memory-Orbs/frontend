@@ -17,10 +17,9 @@ const ForgotPasswordContent = ({ setMode}) => {
   const message = useSelector(selectPasswordResetMessage);
 
 
-    const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
       try {
         const result = await dispatch(sendPasswordResetEmail(values.email));
-
         if (result.meta.requestStatus === "fulfilled") {
           setEmailSent(true);
           toast.success("E-posta başarıyla gönderildi!");
@@ -29,7 +28,9 @@ const ForgotPasswordContent = ({ setMode}) => {
           const errorToShow =
             typeof result.payload === "string"
               ? result.payload
-              : result.payload?.message || "E-posta gönderilemedi";
+              : result.payload && typeof result.payload === "object"
+              ? result.payload.message || JSON.stringify(result.payload)
+              : "E-posta gönderilemedi";
 
           toast.error(errorToShow);
         }
