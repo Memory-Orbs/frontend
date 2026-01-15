@@ -51,7 +51,7 @@
 
 .input:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
 }
 
@@ -64,7 +64,7 @@
 
 .submitButton {
   padding: 12px 20px;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: linear-gradient(135deg, #4caf50, #45a049);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -93,7 +93,7 @@
 }
 
 .loginLink {
-  color: #4CAF50;
+  color: #4caf50;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
