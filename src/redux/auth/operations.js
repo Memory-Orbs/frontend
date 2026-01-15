@@ -147,8 +147,9 @@ export const sendPasswordResetEmail = createAsyncThunk(
       );
       return response.data.data;
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      return thunkAPI.rejectWithValue(message);
+      const errorMessage =
+        error.response?.data?.message || error.message || "Bir hata oluştu";
+      return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
