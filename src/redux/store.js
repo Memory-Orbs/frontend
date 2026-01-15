@@ -20,6 +20,12 @@ export const store = configureStore({
     auth: persistReducer(authPersistConfig, authReducer),
     orbs: persistReducer(orbsPersistConfig, orbsReducer),
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST"],
+      },
+    }),
 });
 
 export let persistor = persistStore(store);
