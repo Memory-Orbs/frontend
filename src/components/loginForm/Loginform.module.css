@@ -1,0 +1,144 @@
+/* Mobil, tablet ve bilgisayar için modern, responsive CSS */
+
+.loginFormContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 30px;
+  background: rgba(42, 14, 79, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 15px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.input {
+  padding: 12px 15px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  font-weight: 400;
+}
+
+.submitButton {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-top: 10px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049, #3e8e41);
+  transform: translateY(-2px);
+}
+
+.submitButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.registerText {
+  margin-top: 20px;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.forgotLink,
+.registerLink {
+  color: #4caf50;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgotLink:hover,
+.registerLink:hover {
+  color: #66bb6a;
+  text-decoration: underline;
+}
+
+/* Tablet ve daha büyük ekranlar için ayarlar */
+@media (min-width: 769px) {
+  .loginFormContainer {
+    max-width: 500px;
+    padding: 40px;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .input {
+    padding: 14px 18px;
+    font-size: 1.1rem;
+  }
+
+  .submitButton {
+    font-size: 1.2rem;
+    padding: 14px 24px;
+  }
+}
+
+/* Bilgisayar için ekstra ayarlar */
+@media (min-width: 1025px) {
+  .loginFormContainer {
+    max-width: 600px;
+  }
+
+  .loginForm {
+    gap: 20px;
+  }
+
+  .label {
+    font-size: 1.1rem;
+  }
+}
