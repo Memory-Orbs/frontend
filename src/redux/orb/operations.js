@@ -3,7 +3,8 @@ import axios from "axios";
 // İstek için temel URL ayarlanmış varsayılıyor.
 // Eğer özel bir axios instance kullanıyorsanız burayı güncelleyin.
 // import { instance } from '../../redux/auth/operations'; // Örnek
-axios.defaults.baseURL = "http://localhost:3000/api"; // Geliştirme ortamı için varsayılan
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+axios.defaults.withCredentials = true;
 /*
  * GET /orbs
  * ?startDate=&endDate=
