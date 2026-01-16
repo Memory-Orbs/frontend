@@ -2,7 +2,7 @@ import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-axios.defaults.withCredentials = true; // cookie'leri otomatik gönder
+axios.defaults.withCredentials = true;
 
 // add response interceptor to handle 401 centrally
 axios.interceptors.response.use(
@@ -68,23 +68,24 @@ export const loginUser = createAsyncThunk(
         { withCredentials: true }
       );
 
-      const { user, accessToken } = response.data.data;
+      // Backend sadece user döner, token cookie'dedir
+      const { user } = response.data.data;
 
-      if (!accessToken) return thunkAPI.rejectWithValue("Token not found");
+      if (!user) {
+        return thunkAPI.rejectWithValue("User not found in response");
+      }
 
-      setAuthHeader(accessToken);
-
-      // LocalStorage'a da kullanıcıyı kaydet
+      // Sadece user bilgisini sakla (opsiyonel)
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", accessToken);
 
-      return { user, token: accessToken };
+      return { user };
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
+      const message = error.response?.data?.message || "Login failed";
       return thunkAPI.rejectWithValue(message);
     }
   }
 );
+
 
 // LOGOUT
 export const logoutUser = createAsyncThunk(
