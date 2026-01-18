@@ -4,13 +4,22 @@ import css from "./App.module.css";
 import { Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
-
+import PrivateRoute from "../../routes/PrivateRoute.jsx";
 
 const Home = lazy(() => import("../../pages/homePage/homePage.jsx"));
 const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage.jsx"));
-const RegisterPage = lazy(() => import("../../pages/registerPage/RegisterPage.jsx"));
-const ForgotPasswordPage = lazy(() => import("../../pages/forgotPassword/ForgotPassword.jsx"));
-const ResetPasswordPage = lazy(() => import("../../pages/forgotPassword/ResetPassword.jsx"));
+const RegisterPage = lazy(
+  () => import("../../pages/registerPage/RegisterPage.jsx"),
+);
+const ForgotPasswordPage = lazy(
+  () => import("../../pages/forgotPassword/ForgotPassword.jsx"),
+);
+const ResetPasswordPage = lazy(
+  () => import("../../pages/forgotPassword/ResetPassword.jsx"),
+);
+const DashboardPage = lazy(
+  () => import("../../pages/dashboardPage/DashboardPage.jsx"),
+);
 
 function App() {
   // const dispatch = useDispatch();
@@ -26,6 +35,14 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/dashboard/:userId"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          ></Route>
         </Routes>
       </Suspense>
       <Toaster position="top-center" reverseOrder={false} />
