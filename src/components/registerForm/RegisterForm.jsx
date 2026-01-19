@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { registerUser } from "../../redux/auth/operations";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../redux/auth/selectors";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector(selectUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialValues = {
@@ -36,9 +39,11 @@ const RegisterForm = () => {
   const handleSubmit = async (values, { resetForm }) => {
     setIsSubmitting(true);
     try {
-      await dispatch(registerUser(values)).unwrap();
+      const result = await dispatch(registerUser(values)).unwrap();
       toast.success("Registration successful!");
       resetForm();
+      const userId = result.user._id || user._id;
+      navigate(`/dashboard/${userId}`);
     } catch (error) {
       toast.error(error.message || "Registration failed. Please try again.");
     } finally {
