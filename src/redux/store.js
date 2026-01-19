@@ -7,7 +7,7 @@ import { orbsReducer } from "./orb/slice";
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["token"],
+  whitelist: ["token", "user", "isLoggedIn"],
 };
 const orbsPersistConfig = {
   key: "orbs",

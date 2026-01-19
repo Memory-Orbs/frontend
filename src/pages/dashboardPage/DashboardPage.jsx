@@ -1,4 +1,4 @@
-import DashboardContent from "../../components/dashboardContent/dashboardContent"
+import DashboardContent from "../../components/dashboardContent/dashboardContent";
 
 function DashboardPage() {
   return <DashboardContent />;

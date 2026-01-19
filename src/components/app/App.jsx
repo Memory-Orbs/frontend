@@ -1,10 +1,12 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import css from "./App.module.css";
-// import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "../../routes/PrivateRoute.jsx";
+import { selectToken } from "../../redux/auth/selectors.js";
+import { setAuthHeader } from "../../redux/auth/operations.js";
 
 const Home = lazy(() => import("../../pages/homePage/homePage.jsx"));
 const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage.jsx"));
@@ -17,14 +19,27 @@ const ForgotPasswordPage = lazy(
 const ResetPasswordPage = lazy(
   () => import("../../pages/forgotPassword/ResetPassword.jsx"),
 );
-const DashboardPage = lazy(
-  () => import("../../pages/dashboardPage/DashboardPage.jsx"),
+const DashboardContent = lazy(
+  () => import("../../components/dashboardContent/dashboardContent.jsx"),
+);
+const DashboardToday = lazy(
+  () => import("../../components/dashboardContent/dashboardToday.jsx"),
+);
+const DashboardHistory = lazy(
+  () => import("../../components/dashboardContent/dashboardHistory.jsx"),
+);
+const DashboardSettings = lazy(
+  () => import("../../components/dashboardContent/dashboardSettings.jsx"),
 );
 
 function App() {
-  // const dispatch = useDispatch();
-  // const isLoggedIn = useSelector((state) => state.auth);
-  // const isRefreshing = useSelector(selectIsRefreshing);
+  const token = useSelector(selectToken);
+
+  useEffect(() => {
+    if (token) {
+      setAuthHeader(token);
+    }
+  }, [token]);
 
   return (
     <div className={css.appContainer}>
@@ -39,10 +54,14 @@ function App() {
             path="/dashboard/:userId"
             element={
               <PrivateRoute>
-                <DashboardPage />
+                <DashboardContent />
               </PrivateRoute>
             }
-          ></Route>
+          >
+            <Route path="today" element={<DashboardToday />} />
+            <Route path="history" element={<DashboardHistory />} />
+            <Route path="settings" element={<DashboardSettings />} />
+          </Route>
         </Routes>
       </Suspense>
       <Toaster position="top-center" reverseOrder={false} />
