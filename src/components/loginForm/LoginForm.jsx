@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { loginUser } from "../../redux/auth/operations";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../redux/auth/selectors";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector(selectUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialValues = {
@@ -28,9 +31,11 @@ const LoginForm = () => {
   const handleSubmit = async (values, { resetForm }) => {
     setIsSubmitting(true);
     try {
-      await dispatch(loginUser(values)).unwrap();
+      const result = await dispatch(loginUser(values)).unwrap();
       toast.success("Login successful!");
       resetForm();
+      const userId = result.user._id || user._id;
+      navigate(`/dashboard/${userId}`);
     } catch (error) {
       toast.error("Login failed. Please check your credentials.");
     } finally {

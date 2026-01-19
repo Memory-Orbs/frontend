@@ -80,7 +80,7 @@ export const authSlice = createSlice({
         };
 
         state.token = token || null;
-        state.isLoggedIn = !!token;
+        state.isLoggedIn = !!user._id;
         state.isLoading = false;
         state.error = null;
       })
