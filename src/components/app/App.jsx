@@ -1,4 +1,4 @@
-import { lazy, useEffect } from "react";
+import { lazy, useEffect, useState } from "react";
 import css from "./App.module.css";
 import { useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import PrivateRoute from "../../routes/PrivateRoute.jsx";
 import { selectToken } from "../../redux/auth/selectors.js";
 import { setAuthHeader } from "../../redux/auth/operations.js";
+import Loader from "../loader/loader.jsx";
 
 const Home = lazy(() => import("../../pages/homePage/homePage.jsx"));
 const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage.jsx"));
@@ -33,6 +34,7 @@ const DashboardSettings = lazy(
 );
 
 function App() {
+  const [isLoading] = useState(true);
   const token = useSelector(selectToken);
 
   useEffect(() => {
@@ -41,9 +43,13 @@ function App() {
     }
   }, [token]);
 
+  // if (isLoading) {
+  //   return <Loader />;
+  // }
+
   return (
     <div className={css.appContainer}>
-      <Suspense fallback={"loading..."}>
+      <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
