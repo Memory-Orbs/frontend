@@ -1,9 +1,11 @@
 import ForgotPasswordContent from "../../components/forgotPasswordContent/forgotPasswordContent";
 
-export const ForgotPasswordPage = () => {
+const ForgotPasswordPage = () => {
   return (
     <>
       <ForgotPasswordContent />
     </>
   );
-};  
+};
+
+export default ForgotPasswordPage;

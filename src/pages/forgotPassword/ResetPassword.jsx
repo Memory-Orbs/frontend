@@ -1,9 +1,11 @@
-import ResetPasswordContent from "../../components/forgotPassword/ResetPasswordContent";
+import ResetPasswordContent from "../../components/forgotPasswordContent/ResetPasswordContent";
 
-export const ResetPasswordPage = () => {
+const ResetPasswordPage = () => {
     return (
         <>
             <ResetPasswordContent />
         </>
     );
 };
+
+export default ResetPasswordPage;
