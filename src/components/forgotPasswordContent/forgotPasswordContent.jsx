@@ -22,7 +22,7 @@ const ForgotPasswordContent = ({ setMode}) => {
         const result = await dispatch(sendPasswordResetEmail(values.email));
         if (result.meta.requestStatus === "fulfilled") {
           setEmailSent(true);
-          toast.success("E-posta başarıyla gönderildi!");
+          toast.success("E-mail sent successfully!");
         } else {
           // Eğer payload bir nesneyse içindeki mesajı al, değilse kendisini kullan
           const errorToShow =
@@ -30,7 +30,7 @@ const ForgotPasswordContent = ({ setMode}) => {
               ? result.payload
               : result.payload && typeof result.payload === "object"
               ? result.payload.message || JSON.stringify(result.payload)
-              : "E-posta gönderilemedi";
+              : "E-mail could not be sent";
 
           toast.error(errorToShow);
         }
@@ -43,23 +43,22 @@ const ForgotPasswordContent = ({ setMode}) => {
     <div className={css.container}>
       {emailSent ? (
         <div className={css.message}>
-          Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen
-          kutunuzu kontrol edin.
+          Reset password link has been sent to your email. Please check your inbox.
         </div>
       ) : (
         <Formik
           initialValues={{ email: "" }}
           validationSchema={Yup.object({
             email: Yup.string()
-              .email("Geçersiz e-posta adresi")
-              .required("*Gerekli"),
+              .email("Invalid email address")
+              .required("Required"),
           })}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, values }) => (
             <Form className={css.form}>
               <div className={css.field}>
-                <label htmlFor="email">E-posta Adresi</label>
+                <label htmlFor="email">Email Address</label>
                 <Field type="email" name="email" className={css.input} />
                 <ErrorMessage
                   name="email"
@@ -74,8 +73,8 @@ const ForgotPasswordContent = ({ setMode}) => {
                 disabled={isSubmitting || isSending}
               >
                 {isSubmitting || isSending
-                  ? "Gönderiliyor..."
-                  : "Şifre Sıfırlama Bağlantısı Gönder"}
+                  ? "Sending..."
+                  : "Send Reset Password Link"}
               </button>
             </Form>
           )}

@@ -28,11 +28,11 @@ export const ResetPasswordContent = () => {
 
   const validationSchema = Yup.object({
     newPassword: Yup.string()
-      .min(6, "Şifre en az 6 karakter olmalıdır")
-      .required("Yeni şifre zorunludur"),
+      .min(6, "Password must be at least 6 characters long")
+      .required("New password is required"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref("newPassword"), null], "Şifreler eşleşmiyor")
-      .required("Şifre tekrarı zorunludur"),
+      .oneOf([Yup.ref("newPassword"), null], "Passwords do not match")
+      .required("Confirm password is required"),
   });
 
   const handleSubmit = async (values, { resetForm }) => {
@@ -46,7 +46,7 @@ export const ResetPasswordContent = () => {
     );
 
     if (resetPassword.fulfilled.match(result)) {
-      toast.success(result.payload?.message || "Şifre başarıyla güncellendi");
+      toast.success(result.payload?.message || "Password updated successfully");
       resetForm();
 
       // YÖNLENDİRME
@@ -56,14 +56,14 @@ export const ResetPasswordContent = () => {
     } else {
       const errorMessage = typeof result.payload === 'string'
         ? result.payload
-        : result.payload?.message || "Şifre sıfırlama başarısız";
+        : result.payload?.message || "Password reset failed";
       toast.error(errorMessage);
     }
   };
 
   return (
     <div className={css.container}>
-      <h2 className={css.message}>Yeni Şifrenizi Belirleyiniz</h2>
+      <h2 className={css.message}>Set New Password</h2>
 
       <Formik
         initialValues={initialValues}
@@ -72,7 +72,7 @@ export const ResetPasswordContent = () => {
       >
         <Form className={css.form}>
           <div className={css.field}>
-            <label>Yeni Şifre</label>
+            <label>New Password</label>
             <Field type="password" name="newPassword" className={css.input} />
             <ErrorMessage
               name="newPassword"
@@ -82,7 +82,7 @@ export const ResetPasswordContent = () => {
           </div>
 
           <div className={css.field}>
-            <label>Yeni Şifre (Tekrar)</label>
+            <label>Confirm Password</label>
             <Field
               type="password"
               name="confirmPassword"
@@ -96,7 +96,7 @@ export const ResetPasswordContent = () => {
           </div>
 
           <button type="submit" className={css.button} disabled={isSending}>
-            {isSending ? "Kaydediliyor..." : "Kaydet"}
+            {isSending ? " Saving..." : "Save"}
           </button>
         </Form>
       </Formik>
