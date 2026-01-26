@@ -15,12 +15,13 @@ export const fetchOrbs = createAsyncThunk(
     try {
       const response = await axios.get("/orbs", {
         params: { startDate, endDate },
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
 /*
  * GET /orbs/date/:date
@@ -29,12 +30,14 @@ export const fetchOrbByDate = createAsyncThunk(
   "orbs/fetchByDate",
   async (date, thunkAPI) => {
     try {
-      const response = await axios.get(`/orbs/date/${date}`);
+      const response = await axios.get(`/orbs/date/${date}`, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
 /*
  * POST /orbs
@@ -44,12 +47,14 @@ export const addOrb = createAsyncThunk(
   "orbs/addOrb",
   async (credentials, thunkAPI) => {
     try {
-      const response = await axios.post("/orbs", credentials);
+      const response = await axios.post("/orbs", credentials, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
 /*
  * PUT /orbs/:id
@@ -64,7 +69,7 @@ export const updateOrb = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
 /*
  * DELETE /orbs/:id
@@ -78,7 +83,7 @@ export const deleteOrb = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
 /*
  * GET /orbs/stats
@@ -95,5 +100,5 @@ export const fetchOrbStats = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
-  }
+  },
 );
