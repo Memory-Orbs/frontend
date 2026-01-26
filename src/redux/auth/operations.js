@@ -12,21 +12,21 @@ axios.interceptors.response.use(
       "Axios error - url:",
       error.config?.url,
       "method:",
-      error.config?.method
+      error.config?.method,
     );
     console.warn("Request headers:", error.config?.headers);
     console.warn(
       "Response status:",
       error.response?.status,
       "body:",
-      error.response?.data
+      error.response?.data,
     );
     // 401 durumunda header temizle (loop engellemek için)
     if (error.response?.status === 401) {
       delete axios.defaults.headers.common.Authorization;
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const setAuthHeader = (token) => {
@@ -54,7 +54,7 @@ export const registerUser = createAsyncThunk(
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // LOGIN
@@ -65,7 +65,7 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(
         "/auth/login",
         { email, password },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       // Backend sadece user döner, token cookie'dedir
@@ -78,14 +78,32 @@ export const loginUser = createAsyncThunk(
       // Sadece user bilgisini sakla (opsiyonel)
       localStorage.setItem("user", JSON.stringify(user));
 
-      return { user };
+      // Login sonrası access token'ı almak için refresh endpoint'i çağır
+      try {
+        const refreshResponse = await axios.post(
+          "/auth/refresh",
+          {},
+          { withCredentials: true },
+        );
+        const accessToken = refreshResponse.data?.data?.accessToken;
+        if (accessToken) {
+          setAuthHeader(accessToken);
+          return { user, token: accessToken };
+        }
+      } catch (refreshError) {
+        console.warn(
+          "Could not get access token from refresh:",
+          refreshError.message,
+        );
+      }
+
+      return { user, token: null };
     } catch (error) {
       const message = error.response?.data?.message || "Login failed";
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
-
 
 // LOGOUT
 export const logoutUser = createAsyncThunk(
@@ -98,7 +116,7 @@ export const logoutUser = createAsyncThunk(
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // REFRESH
@@ -110,7 +128,7 @@ export const refreshUser = createAsyncThunk(
       const response = await axios.post(
         "/auth/refresh",
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const accessToken = response.data?.data?.accessToken;
@@ -130,10 +148,10 @@ export const refreshUser = createAsyncThunk(
       // 401 veya başka bir hata durumunda kullanıcı logout
       // thunkAPI.dispatch(logoutUser());
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message
+        error.response?.data?.message || error.message,
       );
     }
-  }
+  },
 );
 
 //password reset mail
@@ -144,7 +162,7 @@ export const sendPasswordResetEmail = createAsyncThunk(
       const response = await axios.post(
         "/auth/send-reset-email",
         { email },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return response.data.data;
     } catch (error) {
@@ -152,7 +170,7 @@ export const sendPasswordResetEmail = createAsyncThunk(
         error.response?.data?.message || error.message || "Bir hata oluştu";
       return thunkAPI.rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 //password reset
 export const resetPassword = createAsyncThunk(
@@ -162,14 +180,14 @@ export const resetPassword = createAsyncThunk(
       const response = await axios.post(
         "/auth/reset-password",
         { token, password: newPassword },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return response.data.data;
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 // user update
 export const updateUser = createAsyncThunk(
@@ -193,5 +211,5 @@ export const updateUser = createAsyncThunk(
       const message = error.response?.data?.message || "Update failed";
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
