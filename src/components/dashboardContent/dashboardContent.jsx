@@ -4,19 +4,23 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrbByDate } from "../../redux/orb/operations";
 import { selectCurrentOrb } from "../../redux/orb/selectors";
+import { selectUserName } from "../../redux/auth/selectors";
 
 function DashboardContent() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentOrb = useSelector(selectCurrentOrb);
+  const username = useSelector(selectUserName);
 
   const location = useLocation();
 
   useEffect(() => {
     // Only redirect if we are strictly on the dashboard root path
     // This prevents infinite loops and unwanted redirects from sub-pages
-    const isDashboardRoot = location.pathname === `/dashboard/${userId}` || location.pathname === `/dashboard/${userId}/`;
+    const isDashboardRoot =
+      location.pathname === `/dashboard/${userId}` ||
+      location.pathname === `/dashboard/${userId}/`;
 
     if (!isDashboardRoot) return;
 
@@ -28,7 +32,7 @@ function DashboardContent() {
       // result.meta.requestStatus === 'fulfilled' indicates success (orb found/returned)
       // result.meta.requestStatus === 'rejected' indicates failure (likely 404/no orb)
       // We also check result.payload just to be safe if backend returns null on success
-      if (result.meta.requestStatus === 'fulfilled' && result.payload) {
+      if (result.meta.requestStatus === "fulfilled" && result.payload) {
         navigate(`/dashboard/${userId}/history`, { replace: true });
       } else {
         navigate(`/dashboard/${userId}/today`, { replace: true });
@@ -40,7 +44,7 @@ function DashboardContent() {
     <>
       <div className={css.container}>
         <div className={css.headerWrapper}>
-          <h1 className={css.title}>Dashboard</h1>
+          <h1 className={css.title}>Welcome {username || ""}</h1>
           <button
             className={css.settingsBtn}
             onClick={() => navigate(`/dashboard/${userId}/settings`)}
@@ -48,7 +52,7 @@ function DashboardContent() {
             Settings
           </button>
         </div>
-        <p className={css.description}>Welcome to your dashboard!</p>
+        
       </div>
       <Outlet />
     </>

@@ -1,0 +1,104 @@
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dateGroup {
+  border-left: 4px solid #007bff;
+  padding-left: 1.5rem;
+}
+
+.dateHeader {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 1rem 0;
+  text-transform: capitalize;
+}
+
+.orbCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.orbCard {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.orbCard:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.orbContent {
+  flex: 1;
+}
+
+.orbDate {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.orbEmotions {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0.5rem 0;
+  word-break: break-word;
+}
+
+.orbNote {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0.5rem 0 0 0;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.editBtn {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
+}
+
+.editBtn:hover {
+  background-color: #218838;
+}
+
+.editBtn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+  .orbCards {
+    grid-template-columns: 1fr;
+  }
+
+  .dateGroup {
+    padding-left: 1rem;
+    border-left-width: 3px;
+  }
+
+  .dateHeader {
+    font-size: 1.1rem;
+  }
+}

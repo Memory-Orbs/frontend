@@ -11,10 +11,9 @@ axios.defaults.withCredentials = true;
  */
 export const fetchOrbs = createAsyncThunk(
   "orbs/fetchAll",
-  async ({ startDate, endDate }, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const response = await axios.get("/orbs", {
-        params: { startDate, endDate },
         withCredentials: true,
       });
       return response.data;
