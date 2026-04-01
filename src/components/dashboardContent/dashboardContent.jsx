@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchOrbByDate } from "../../redux/orb/operations";
 import { selectCurrentOrb } from "../../redux/orb/selectors";
 import { selectUserName } from "../../redux/auth/selectors";
+import { logoutUser } from "../../redux/auth/operations";
+
 
 function DashboardContent() {
   const { userId } = useParams();
@@ -14,6 +16,15 @@ function DashboardContent() {
   const username = useSelector(selectUserName);
 
   const location = useLocation();
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   useEffect(() => {
     // Only redirect if we are strictly on the dashboard root path
@@ -45,14 +56,28 @@ function DashboardContent() {
       <div className={css.container}>
         <div className={css.headerWrapper}>
           <h1 className={css.title}>Welcome {username || ""}</h1>
-          <button
-            className={css.settingsBtn}
-            onClick={() => navigate(`/dashboard/${userId}/settings`)}
-          >
-            Settings
-          </button>
+          <div className={css.navButtons}>
+            <button
+              className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}
+              onClick={() => navigate(`/dashboard/${userId}/history`)}
+            >
+              History
+            </button>
+            <button
+              className={`${css.navBtn} ${location.pathname.includes("/settings") ? css.activeNavBtn : ""}`}
+              onClick={() => navigate(`/dashboard/${userId}/settings`)}
+            >
+              Settings
+            </button>
+            <button
+              className={css.logoutBtn}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
-        
+
       </div>
       <Outlet />
     </>
