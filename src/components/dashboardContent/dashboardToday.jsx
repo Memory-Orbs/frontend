@@ -113,6 +113,7 @@ function DashboardToday() {
       {/* 3D Canvas rendering the Orb and Tube */}
       <OrbCanvas>
         <TubeStructure visible={isAnimating} />
+        
         {isAnimating ? (
           <AnimatedTubeOrb onComplete={handleAnimationComplete} duration={2.5}>
             <Orb {...orbState} scale={1} />
