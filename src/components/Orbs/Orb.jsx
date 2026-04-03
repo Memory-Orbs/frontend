@@ -90,7 +90,7 @@ export const Orb = ({
       if (fill > 0.01) {
         innerMeshRef.current.visible = true;
         const pulse = Math.sin(time * 4.0) * 0.02;
-        const innerScale = 0.88 + pulse;
+        const innerScale = 1.0 + pulse; /* Glass kabuk olmadığı için tam boyut! */
         innerMeshRef.current.scale.set(innerScale, innerScale, innerScale);
       } else {
         innerMeshRef.current.visible = false;
@@ -106,24 +106,7 @@ export const Orb = ({
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* High-Performance Glass Core */}
-      <mesh>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          metalness={0.1}
-          roughness={0}
-          opacity={0.15}
-          transparent={true}
-          side={THREE.DoubleSide}
-          clearcoat={1.0}
-          clearcoatRoughness={0}
-          reflectivity={1}
-          ior={1.5}
-        />
-      </mesh>
-      
-      {/* Emotion Plazma */}
+      {/* Sadece Doğrudan Duygu Küresi Render Edilir (Dış Camsız) */}
       <mesh ref={innerMeshRef}>
         <sphereGeometry args={[1, 32, 32]} />
         <shaderMaterial
@@ -131,7 +114,7 @@ export const Orb = ({
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
           uniforms={uniforms}
-          transparent={false}
+          transparent={true}
         />
       </mesh>
     </group>

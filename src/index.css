@@ -108,7 +108,7 @@ body::after {
   height: 120vh;
   z-index: -1;
   pointer-events: none;
-  filter: blur(40px); /* Büyülü küreler yanılsaması (Keskinlik artırıldı) */
+  filter: blur(40px); /* Büyülü küreler yanılsaması, tekrar aktif edildi */
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.7) 0%, transparent 30%),   /* Joy */
     radial-gradient(circle at 90% 30%, rgba(239, 68, 68, 0.6) 0%, transparent 30%),    /* Anger */
@@ -118,7 +118,7 @@ body::after {
   animation: emotionOrbs 25s ease-in-out infinite alternate;
 }
 
-/* Gece modunda kürelerin parlaklığını biraz daha güçlü tut ki yıldızlardan ayrılsın */
+/* Gece modunda kürelerin parlaklığını koruyan ayarlar */
 body.night-mode::after {
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.5) 0%, transparent 30%),   
