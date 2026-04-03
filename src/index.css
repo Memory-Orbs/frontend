@@ -51,7 +51,7 @@ body.night-mode {
   height: 200vh;
   background: repeating-conic-gradient(
     from 0deg at 50% 50%,
-    rgba(255, 255, 255, 0.4) 0deg 10deg,
+    rgba(255, 255, 255, 0.15) 0deg 10deg,
     transparent 10deg 20deg
   );
   animation: sunSpin 100s linear infinite;
@@ -108,24 +108,24 @@ body::after {
   height: 120vh;
   z-index: -1;
   pointer-events: none;
-  filter: blur(100px); /* Büyülü küreler yanılsaması (GLOW) */
+  filter: blur(40px); /* Büyülü küreler yanılsaması (Keskinlik artırıldı) */
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.4) 0%, transparent 40%),   /* Joy */
-    radial-gradient(circle at 90% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 40%),    /* Anger */
-    radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.3) 0%, transparent 40%),    /* Disgust */
-    radial-gradient(circle at 80% 90%, rgba(59, 130, 246, 0.3) 0%, transparent 40%),   /* Sadness */
-    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.25) 0%, transparent 50%);  /* Fear */
-  animation: emotionOrbs 25s ease-in-out infinite alternate; /* Çok yavaş, pürüzsüz */
+    radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.7) 0%, transparent 30%),   /* Joy */
+    radial-gradient(circle at 90% 30%, rgba(239, 68, 68, 0.6) 0%, transparent 30%),    /* Anger */
+    radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.6) 0%, transparent 30%),    /* Disgust */
+    radial-gradient(circle at 80% 90%, rgba(59, 130, 246, 0.6) 0%, transparent 30%),   /* Sadness */
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.5) 0%, transparent 40%);  /* Fear */
+  animation: emotionOrbs 25s ease-in-out infinite alternate;
 }
 
-/* Gece modunda kürelerin parlaklığını loş tut */
+/* Gece modunda kürelerin parlaklığını biraz daha güçlü tut ki yıldızlardan ayrılsın */
 body.night-mode::after {
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.2) 0%, transparent 40%),   
-    radial-gradient(circle at 90% 30%, rgba(239, 68, 68, 0.2) 0%, transparent 40%),    
-    radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 40%),    
-    radial-gradient(circle at 80% 90%, rgba(59, 130, 246, 0.2) 0%, transparent 40%),   
-    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);  
+    radial-gradient(circle at 10% 20%, rgba(253, 224, 71, 0.5) 0%, transparent 30%),   
+    radial-gradient(circle at 90% 30%, rgba(239, 68, 68, 0.5) 0%, transparent 30%),    
+    radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.5) 0%, transparent 30%),    
+    radial-gradient(circle at 80% 90%, rgba(59, 130, 246, 0.5) 0%, transparent 30%),   
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.4) 0%, transparent 40%);  
 }
 
 @keyframes emotionOrbs {
