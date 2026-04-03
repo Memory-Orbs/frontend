@@ -1,12 +1,9 @@
 .appContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #ffffff;
-  padding:5px;
-  border-radius: 10%;
-  box-shadow: inset 0 0 20px 20px #2A0E4F;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
-

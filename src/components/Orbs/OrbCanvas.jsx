@@ -6,13 +6,14 @@ export const OrbCanvas = ({ children, hideControls = true }) => {
   return (
     <div style={{ 
       width: '100%', 
-      height: '400px', 
-      marginBottom: '20px', 
+      height: '250px',
+      marginBottom: '1rem', 
       position: 'relative',
-      background: 'rgba(100, 100, 100, 0.08)', // Subtle grey background for contrast
-      borderRadius: '16px',
+      background: 'transparent', 
       overflow: 'hidden',
-      border: '1px solid rgba(0,0,0,0.05)'
+      border: 'none', 
+      outline: 'none',
+      zIndex: 10
     }}>
       <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 45 }}>
         <ambientLight intensity={0.6} />
