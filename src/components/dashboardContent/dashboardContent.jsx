@@ -1,6 +1,6 @@
 import css from "./dashboardContent.module.css";
 import { Outlet, useParams, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrbByDate } from "../../redux/orb/operations";
 import { selectCurrentOrb } from "../../redux/orb/selectors";
@@ -16,6 +16,19 @@ function DashboardContent() {
   const username = useSelector(selectUserName);
 
   const location = useLocation();
+
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'day');
+
+  useEffect(() => {
+    if (theme === 'night') {
+      document.body.classList.add('night-mode');
+    } else {
+      document.body.classList.remove('night-mode');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'day' ? 'night' : 'day');
 
   const handleLogout = async () => {
     try {
@@ -40,9 +53,6 @@ function DashboardContent() {
 
     // Backend'den bugüne ait orb'u kontrol et
     dispatch(fetchOrbByDate(today)).then((result) => {
-      // result.meta.requestStatus === 'fulfilled' indicates success (orb found/returned)
-      // result.meta.requestStatus === 'rejected' indicates failure (likely 404/no orb)
-      // We also check result.payload just to be safe if backend returns null on success
       if (result.meta.requestStatus === "fulfilled" && result.payload) {
         navigate(`/dashboard/${userId}/history`, { replace: true });
       } else {
@@ -57,9 +67,11 @@ function DashboardContent() {
         <div className={css.headerWrapper}>
           <h1 className={css.title}>Welcome {username || ""}</h1>
           <div className={css.navButtons}>
+            <button className={css.themeBtn} onClick={toggleTheme}>
+               {theme === 'day' ? '🏙️ Day Mode' : '🌌 Night Mode'}
+            </button>
             <button
-              className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}
-              onClick={() => navigate(`/dashboard/${userId}/history`)}
+              className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}              onClick={() => navigate(`/dashboard/${userId}/history`)}
             >
               History
             </button>

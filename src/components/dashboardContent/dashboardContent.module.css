@@ -1,23 +1,28 @@
 .container {
-  padding: 2rem;
+  padding: 1rem 2rem; 
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .headerWrapper {
   display: flex;
-  justify-content: space-between; /* Başlık solda, butonlar sağda */
+  justify-content: space-between; 
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1rem; /* Küçültüldü */
   width: 100%;
+  gap: 2rem; /* Başlık ile navigasyon ayrıldı */
 }
 
 .navButtons {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem; /* Butonlar arasındaki mesafe */
-  flex-wrap: nowrap; /* Tek sıra garanti */
-  margin-left: auto; /* Kesin sağa yaslama */
+  gap: 1rem; /* Butonlar arasına eşit açık mesafe */
+  flex-wrap: nowrap; 
+  margin-left: auto; 
 }
 
 
@@ -84,8 +89,33 @@
   justify-content: flex-start;
   font-size: 24px;
   font-weight: bold;
-  color: #333;
+  color: var(--text-main); /* Hem gece hem gündüz uyumlu */
   margin: 0;
+  flex: 1;
+}
+
+.themeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  height: 40px;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(5px);
+  color: #1e293b;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
+}
+
+.themeBtn:hover {
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .description {
@@ -117,14 +147,24 @@
 .formContainer {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  max-width: 600px;
+  gap: 1rem; /* Daraltıldı */
+  width: 100%;
+  max-width: 500px; 
+  margin: 0 auto; 
+  background: rgba(255, 255, 255, 0.75); 
+  padding: 1.5rem; /* Daraltıldı */
+  border-radius: 20px; 
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8); 
 }
 
 .formGroup {
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: center; /* Grup elemanlarını da ortala */
 }
 
 .inputGroup {
@@ -134,18 +174,23 @@
 }
 
 .label {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   margin-bottom: 0.5rem;
-  color: #555;
-  font-weight: 500;
+  color: #333; /* Daha koyu başlık */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
 }
 
 .input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95); /* Hafif opak input alanları */
+  border-radius: 10px; /* Modern yuvarlaklık */
   font-size: 1rem;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .input:focus {
@@ -160,15 +205,19 @@
 }
 
 .submitBtn {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  background-color: #28a745;
+  padding: 0.9rem 1.5rem;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); /* Modern yeşil gradient */
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  align-self: flex-start;
+  transition: all 0.3s ease;
+  width: 100%; /* Modern görünüm için buton devasa olabilir veya centerlanabilir */
+  align-self: center; /* Ortala */
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .submitBtn:hover {
