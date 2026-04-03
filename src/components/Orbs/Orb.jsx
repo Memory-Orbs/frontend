@@ -4,11 +4,9 @@ import * as THREE from 'three';
 
 const vertexShader = `
   varying vec2 vUv;
-  varying vec3 vPosition;
   varying vec3 vNormal;
   void main() {
     vUv = uv;
-    vPosition = position;
     vNormal = normalize(normalMatrix * normal);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
@@ -20,29 +18,13 @@ const fragmentShader = `
   uniform float uRatio;
   uniform float uTime;
   uniform float uFill;
-  
-  varying vec2 vUv;
-  varying vec3 vPosition;
   varying vec3 vNormal;
 
   void main() {
-    // Işık ve derinlik efekti (Fresnel)
-    float fresnel = dot(vNormal, vec3(0.0, 0.0, 1.0));
-    fresnel = clamp(1.0 - fresnel, 0.0, 1.0);
-    fresnel = pow(fresnel, 2.0);
-
-    // Renk karışımı
-    float noise = sin(vPosition.x * 2.0 + uTime) * cos(vPosition.y * 2.0 + uTime) * 0.5 + 0.5;
-    vec3 baseColor = mix(uColor1, uColor2, clamp(uRatio + (noise - 0.5) * 0.3, 0.0, 1.0));
-    
-    // Boş/Dolu hali
-    vec3 glassColor = vec3(0.8, 0.8, 0.9); // Hafif maviye çalan cam rengi
-    vec3 finalColor = mix(glassColor, baseColor, uFill);
-    
-    // Opaklık ayarı (Boşken daha şeffaf, doluyken daha canlı)
-    float alpha = mix(0.3, 0.9, uFill) + fresnel * 0.5;
-    
-    gl_FragColor = vec4(finalColor + fresnel * 0.2, alpha);
+    float n = sin(vNormal.x * 2.0 + uTime) * cos(vNormal.y * 2.0 + uTime) * 0.5 + 0.5;
+    vec3 baseColor = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.2, 0.0, 1.0));
+    float alpha = uFill > 0.01 ? uFill : 0.0;
+    gl_FragColor = vec4(baseColor, alpha);
   }
 `;
 
@@ -51,18 +33,18 @@ export const Orb = ({
   color2 = "#ffffff", 
   ratio = 0.5, 
   fill = 0, 
-  targetPosition = null, 
-  isAnimating = false, 
-  onAnimationComplete = null,
   scale = 1,
-  onClick = null,
-  position = [0, 0, 0]
+  position = [0, 0, 0],
+  isAnimating = false, 
+  targetPosition = null,
+  onAnimationComplete = null,
+  onClick = null
 }) => {
-  const meshRef = useRef();
+  const groupRef = useRef();
+  const innerMeshRef = useRef();
   const materialRef = useRef();
   const [hovered, setHovered] = useState(false);
   
-  // Uniforms stable reference
   const uniforms = useMemo(() => ({
     uColor1: { value: new THREE.Color(color1) },
     uColor2: { value: new THREE.Color(color2) },
@@ -71,12 +53,6 @@ export const Orb = ({
     uFill: { value: fill }
   }), []);
 
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto';
-    return () => { document.body.style.cursor = 'auto'; };
-  }, [hovered]);
-
-  // Update uniforms when props change dynamically
   useEffect(() => {
     if (materialRef.current) {
       materialRef.current.uniforms.uColor1.value.set(new THREE.Color(color1));
@@ -87,53 +63,78 @@ export const Orb = ({
   }, [color1, color2, ratio, fill]);
 
   useFrame((state, delta) => {
-    if (meshRef.current) {
-      if (materialRef.current) materialRef.current.uniforms.uTime.value += delta;
-      
-      // Floating animation when idle
-      if (!isAnimating && !targetPosition) {
-        meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime + position[0]) * 0.1;
-      }
-      
-      // Lerp to target position for shelf animation
-      if (isAnimating && targetPosition) {
-        const targetVec = Array.isArray(targetPosition) 
-           ? new THREE.Vector3(...targetPosition) 
-           : targetPosition;
-           
-        meshRef.current.position.lerp(targetVec, 0.05);
-        
-        if (meshRef.current.position.distanceTo(targetVec) < 0.05) {
-          if (onAnimationComplete) onAnimationComplete();
-        }
-      }
-      
-      // Hover scale effect
-      if (!isAnimating) {
-        const targetScale = hovered ? scale * 1.1 : scale;
-        meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+    if (!groupRef.current) return;
+    
+    // Safely get time
+    let time = 0;
+    try { time = state.clock.getElapsedTime(); } catch(e) { time = Date.now() * 0.001; }
+    
+    if (materialRef.current) materialRef.current.uniforms.uTime.value = time;
+    
+    // Smooth idle animation
+    if (!isAnimating && !targetPosition) {
+      groupRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.1;
+      groupRef.current.rotation.y += delta * 0.15;
+    }
+
+    // Stabilized scale logic (Prevent NaN/Context Lost)
+    const validScale = isNaN(scale) ? 1 : Math.max(0.01, scale);
+    const targetScale = hovered ? validScale * 1.1 : validScale;
+    const currentScale = groupRef.current.scale.x || validScale;
+    const lerped = THREE.MathUtils.lerp(currentScale, targetScale, 0.1);
+    const safeFinalScale = isNaN(lerped) ? validScale : lerped;
+    groupRef.current.scale.set(safeFinalScale, safeFinalScale, safeFinalScale);
+
+    // Inner core logic
+    if (innerMeshRef.current) {
+      if (fill > 0.01) {
+        innerMeshRef.current.visible = true;
+        const pulse = Math.sin(time * 4.0) * 0.02;
+        const innerScale = 0.88 + pulse;
+        innerMeshRef.current.scale.set(innerScale, innerScale, innerScale);
+      } else {
+        innerMeshRef.current.visible = false;
       }
     }
   });
 
   return (
-    <mesh 
-      ref={meshRef} 
-      scale={scale}
+    <group 
+      ref={groupRef} 
       position={position}
       onClick={onClick}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      <sphereGeometry args={[1, 64, 64]} />
-      <shaderMaterial
-        ref={materialRef}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={uniforms}
-        transparent={true}
-      />
-    </mesh>
+      {/* High-Performance Glass Core */}
+      <mesh>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          metalness={0.1}
+          roughness={0}
+          opacity={0.15}
+          transparent={true}
+          side={THREE.DoubleSide}
+          clearcoat={1.0}
+          clearcoatRoughness={0}
+          reflectivity={1}
+          ior={1.5}
+        />
+      </mesh>
+      
+      {/* Emotion Plazma */}
+      <mesh ref={innerMeshRef}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <shaderMaterial
+          ref={materialRef}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={uniforms}
+          transparent={false}
+        />
+      </mesh>
+    </group>
   );
 };
 

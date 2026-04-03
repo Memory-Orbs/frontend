@@ -9,14 +9,17 @@ export const OrbCanvas = ({ children, hideControls = true }) => {
       height: '400px', 
       marginBottom: '20px', 
       position: 'relative',
-      background: 'rgba(100, 100, 100, 0.08)', // Subtle grey background for contrast
-      borderRadius: '16px',
+      background: '#ffffff',
+      borderRadius: '24px',
       overflow: 'hidden',
-      border: '1px solid rgba(0,0,0,0.05)'
+      border: '1px solid rgba(0,0,0,0.05)',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.04)'
     }}>
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 45 }}>
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 6], fov: 45 }}>
+        <Environment preset="city" />
+        <ambientLight intensity={0.8} />
+        <pointLight position={[10, 10, 10]} intensity={2} />
+        <pointLight position={[-10, -10, -10]} intensity={1} />
         
         {children}
         
