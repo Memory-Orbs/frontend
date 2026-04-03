@@ -2,29 +2,84 @@ import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const vertexShader = `
-  varying vec2 vUv;
+const glassVertexShader = `
   varying vec3 vNormal;
+  varying vec3 vViewDir;
   void main() {
-    vUv = uv;
     vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewDir = normalize(-mvPosition.xyz);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const glassFragmentShader = `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  uniform float uTime;
+
+  void main() {
+    float vDotN = dot(vViewDir, vNormal);
+    float fresnel = pow(clamp(1.0 - vDotN, 0.0, 1.0), 3.0);
+    
+    // 1. Crystal Transparency & Rim (Visibility)
+    float edge = 0.2 + 0.6 * fresnel;
+    
+    // 2. Studio Highlights
+    vec3 lPos = normalize(vec3(5.0, 10.0, 5.0));
+    float spec = pow(max(dot(vNormal, lPos), 0.0), 128.0) * 1.5;
+    
+    // 3. Fake Refraction & Depth
+    float coreHighlight = pow(vDotN, 10.0) * 0.2;
+    float bounceLight = pow(max(dot(vNormal, vec3(0.0, -1.0, 0.0)), 0.0), 4.0) * 0.4;
+    
+    // 4. White BG Contrast: Beyaz zeminde kontur çizgisi
+    float contour = pow(fresnel, 20.0) * 0.5; 
+    
+    vec3 baseCol = vec3(0.94, 0.97, 1.0);
+    vec3 finalColor = baseCol + spec + coreHighlight + bounceLight - contour;
+    
+    gl_FragColor = vec4(finalColor, clamp(edge + spec * 0.5, 0.0, 1.0));
+  }
+`;
+
+const innerVertexShader = `
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vPosition = position;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
-const fragmentShader = `
+const innerFragmentShader = `
   uniform vec3 uColor1;
   uniform vec3 uColor2;
   uniform float uRatio;
   uniform float uTime;
   uniform float uFill;
   varying vec3 vNormal;
+  varying vec3 vPosition;
 
   void main() {
-    float n = sin(vNormal.x * 2.0 + uTime) * cos(vNormal.y * 2.0 + uTime) * 0.5 + 0.5;
-    vec3 baseColor = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.2, 0.0, 1.0));
-    float alpha = uFill > 0.01 ? uFill : 0.0;
-    gl_FragColor = vec4(baseColor, alpha);
+    float t = uTime * 0.6;
+    float n = sin(vPosition.x * 2.0 + t) * cos(vPosition.z * 2.0 - t) * 0.5 + 0.5;
+    vec3 color = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.35, 0.0, 1.0));
+    
+    // Volumetric Glow
+    float glow = pow(dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
+    gl_FragColor = vec4(color * (0.3 + 0.7 * glow), uFill);
+  }
+`;
+
+const shadowFragmentShader = `
+  uniform float uOpacity;
+  varying vec2 vUv;
+  void main() {
+    float d = distance(vUv, vec2(0.5));
+    float a = smoothstep(0.5, 0.1, d) * uOpacity;
+    gl_FragColor = vec4(0.0, 0.0, 0.0, a);
   }
 `;
 
@@ -43,6 +98,8 @@ export const Orb = ({
   const groupRef = useRef();
   const innerMeshRef = useRef();
   const materialRef = useRef();
+  const glassRef = useRef();
+  const shadowRef = useRef();
   const [hovered, setHovered] = useState(false);
   
   const uniforms = useMemo(() => ({
@@ -52,6 +109,9 @@ export const Orb = ({
     uTime: { value: 0 },
     uFill: { value: fill }
   }), []);
+
+  const glassUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
+  const shadowUniforms = useMemo(() => ({ uOpacity: { value: 0.3 } }), []);
 
   useEffect(() => {
     if (materialRef.current) {
@@ -64,34 +124,32 @@ export const Orb = ({
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
-    
-    // Safely get time
-    let time = 0;
-    try { time = state.clock.getElapsedTime(); } catch(e) { time = Date.now() * 0.001; }
+    const time = state.clock.getElapsedTime();
     
     if (materialRef.current) materialRef.current.uniforms.uTime.value = time;
+    if (glassRef.current) glassRef.current.uniforms.uTime.value = time;
     
-    // Smooth idle animation
     if (!isAnimating && !targetPosition) {
-      groupRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.1;
-      groupRef.current.rotation.y += delta * 0.15;
+      groupRef.current.position.y = position[1] + Math.sin(time * 1.4) * 0.15;
+      groupRef.current.rotation.y += delta * 0.3;
+      
+      if (shadowRef.current && shadowRef.current.material.uniforms) {
+        const s = 1.3 - Math.sin(time * 1.4) * 0.2;
+        shadowRef.current.scale.set(s, s, 1);
+        shadowRef.current.material.uniforms.uOpacity.value = 0.3 - Math.sin(time * 1.4) * 0.1;
+      }
     }
 
-    // Stabilized scale logic (Prevent NaN/Context Lost)
-    const validScale = isNaN(scale) ? 1 : Math.max(0.01, scale);
-    const targetScale = hovered ? validScale * 1.1 : validScale;
-    const currentScale = groupRef.current.scale.x || validScale;
-    const lerped = THREE.MathUtils.lerp(currentScale, targetScale, 0.1);
-    const safeFinalScale = isNaN(lerped) ? validScale : lerped;
-    groupRef.current.scale.set(safeFinalScale, safeFinalScale, safeFinalScale);
+    const b = isNaN(scale) ? 1 : Math.max(0.01, scale);
+    const ts = hovered ? b * 1.15 : b;
+    const cur = groupRef.current.scale.x || b;
+    const res = THREE.MathUtils.lerp(cur, ts, 0.1);
+    groupRef.current.scale.set(res, res, res);
 
-    // Inner core logic
     if (innerMeshRef.current) {
       if (fill > 0.01) {
         innerMeshRef.current.visible = true;
-        const pulse = Math.sin(time * 4.0) * 0.02;
-        const innerScale = 0.88 + pulse;
-        innerMeshRef.current.scale.set(innerScale, innerScale, innerScale);
+        innerMeshRef.current.scale.setScalar(0.88 + Math.sin(time * 3.5) * 0.02);
       } else {
         innerMeshRef.current.visible = false;
       }
@@ -99,41 +157,45 @@ export const Orb = ({
   });
 
   return (
-    <group 
-      ref={groupRef} 
-      position={position}
-      onClick={onClick}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      {/* High-Performance Glass Core */}
-      <mesh>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          metalness={0.1}
-          roughness={0}
-          opacity={0.15}
-          transparent={true}
-          side={THREE.DoubleSide}
-          clearcoat={1.0}
-          clearcoatRoughness={0}
-          reflectivity={1}
-          ior={1.5}
-        />
-      </mesh>
-      
-      {/* Emotion Plazma */}
-      <mesh ref={innerMeshRef}>
-        <sphereGeometry args={[1, 32, 32]} />
+    <group position={position}>
+      <mesh ref={shadowRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]}>
+        <planeGeometry args={[2.5, 2.5]} />
         <shaderMaterial
-          ref={materialRef}
-          vertexShader={vertexShader}
-          fragmentShader={fragmentShader}
-          uniforms={uniforms}
-          transparent={false}
+          fragmentShader={shadowFragmentShader}
+          vertexShader={`varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`}
+          uniforms={shadowUniforms}
+          transparent={true}
         />
       </mesh>
+
+      <group 
+        ref={groupRef} 
+        onClick={onClick}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <mesh>
+          <sphereGeometry args={[1, 64, 64]} />
+          <shaderMaterial
+            ref={glassRef}
+            vertexShader={glassVertexShader}
+            fragmentShader={glassFragmentShader}
+            uniforms={glassUniforms}
+            transparent={true}
+          />
+        </mesh>
+        
+        <mesh ref={innerMeshRef}>
+          <sphereGeometry args={[1, 48, 48]} />
+          <shaderMaterial
+            ref={materialRef}
+            vertexShader={innerVertexShader}
+            fragmentShader={innerFragmentShader}
+            uniforms={uniforms}
+            transparent={false}
+          />
+        </mesh>
+      </group>
     </group>
   );
 };
