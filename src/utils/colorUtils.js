@@ -1,7 +1,7 @@
 export const EMOTIONS = [
   "joy",
   "sadness",
-  "anger",
+  "angry",
   "disgust",
   "fear",
   "anxiety",
@@ -13,7 +13,7 @@ export const EMOTIONS = [
 export const EMOTION_COLORS = {
   joy: "#FDE047", // Yellow
   sadness: "#3B82F6", // Blue
-  anger: "#EF4444", // Red
+  angry: "#EF4444", // Red
   disgust: "#22C55E", // Green
   fear: "#A855F7", // Purple
   anxiety: "#F97316", // Orange

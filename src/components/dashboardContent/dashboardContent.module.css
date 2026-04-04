@@ -44,7 +44,7 @@
   padding: 0;
   font-size: 0.9rem;
   font-family: inherit;
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.6);
   color: #562266;
   text-shadow: none;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
@@ -58,7 +58,7 @@
 :global(.night-mode) .navBtn {
   color: white;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-  background-color: rgba(65, 61, 61, 0.75);
+  background-color: rgba(30, 41, 59, 0.6);
 }
 
 .navBtn:hover {
@@ -67,6 +67,11 @@
   text-shadow: 1px 1px 3px rgba(86, 34, 102, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 0 15px rgba(86, 34, 102, 0.6);
+}
+
+:global(.night-mode) .navBtn:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+
 }
 
 .activeNavBtn {
@@ -87,6 +92,7 @@
 
 :global(.night-mode) .activeNavBtn:hover {
    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+   background-color: rgba(255, 255, 255, 0.8);
 }
 
 .logoutBtn {
@@ -111,6 +117,7 @@
 :global(.night-mode) .logoutBtn {
   color: white;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+   background-color: rgba(220, 53, 69, 0.6);
 }
 
 .logoutBtn:hover {
@@ -124,6 +131,7 @@
 :global(.night-mode) .logoutBtn:hover {
  color: #ffffff;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  background-color: rgba(220, 53, 69, 0.75);
 }
 
 
@@ -133,7 +141,9 @@
   justify-content: flex-start;
   font-size: 24px;
   font-weight: bold;
+  letter-spacing: 0.5px;
   color: var(--text-main); /* Hem gece hem gündüz uyumlu */
+  text-shadow: var(--text-main-shadow);
   margin: 0;
   flex: 1;
 }
@@ -267,7 +277,7 @@
 }
 
 :global(.night-mode) .formContainer {
-  background: rgba(255, 255, 255, 0.75); 
+  background: rgba(30, 41, 59, 0.8); 
 }
 
 .formGroup {
@@ -286,7 +296,8 @@
 .label {
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
-  color: #562266; /* Login yazısı rengi */
+  color: rgb(86, 34, 102); /* Login yazısı rengi */
+  text-shadow: 1px 1px 3px rgba(86, 34, 102, 0.4);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -336,7 +347,19 @@
   box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
+:global(.night-mode) .submitBtn {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, #22c55e 100%);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
 .submitBtn:hover {
+  background-color: #218737;
+   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px  rgba(33, 135, 55, 0.6);
+}
+
+:global(.night-mode) .submitBtn:hover {
   background-color: #218737;
    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   transform: translateY(-2px);

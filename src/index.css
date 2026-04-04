@@ -8,7 +8,9 @@
   --disgust: #22C55E;
   --fear: #A855F7;
   
-  --text-main: #1e293b; /* Gündüz modu için koyu renk metin */
+  --text-main: rgb(34, 48, 71); /* Gündüz modu için koyu renk metin */
+  --text-main-shadow: 1px 1px 1px rgba(34, 48, 71, 0.5);
+  
 }
 
 /* Gece modu root değişkenleri */
