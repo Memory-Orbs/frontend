@@ -1,13 +1,13 @@
 export const EMOTIONS = [
-  "joy",
-  "sadness",
-  "angry",
-  "disgust",
-  "fear",
-  "anxiety",
-  "envy",
-  "ennui",
-  "embarrassment",
+  "Joy",
+  "Sadness",
+  "Angry",
+  "Disgust",
+  "Fear",
+  "Anxiety",
+  "Envy",
+  "Ennui",
+  "Embarrassment",
 ];
 
 export const EMOTION_COLORS = {

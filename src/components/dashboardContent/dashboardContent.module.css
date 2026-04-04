@@ -277,7 +277,7 @@
 }
 
 :global(.night-mode) .formContainer {
-  background: rgba(30, 41, 59, 0.8); 
+  background: rgba(30, 41, 59, 0.4); 
 }
 
 .formGroup {
@@ -305,22 +305,79 @@
 }
 
 :global(.night-mode) .label {
-  color: #333; /* Gece açık zemin üzerinde daha koyu */
+  color: #f8fafc;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-.input {
-  padding: 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.95); /* Hafif opak input alanları */
-  border-radius: 10px; /* Modern yuvarlaklık */
+.input, .textarea {
+  padding: 0.85rem 1rem;
+  border: 2px solid rgba(86, 34, 102, 0.1);
+  background: rgba(255, 255, 255, 0.5); /* Cam efekti */
+  border-radius: 14px;
   font-size: 1rem;
-  transition: all 0.3s;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  font-family: inherit;
+  color: #333;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Eğlenceli yaylanma efekti */
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), 0 2px 10px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.input:focus {
-  border-color: #007bff;
+:global(.night-mode) .input,
+:global(.night-mode) .textarea {
+  background: rgba(15, 23, 42, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05), 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.input:hover, .textarea:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(86, 34, 102, 0.3);
+  transform: translateY(-2px);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.9), 0 6px 15px rgba(86, 34, 102, 0.1);
+}
+
+:global(.night-mode) .input:hover,
+:global(.night-mode) .textarea:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.input:focus, .textarea:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(86, 34, 102, 0.6);
   outline: none;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 1), 0 12px 25px rgba(86, 34, 102, 0.2);
+}
+
+:global(.night-mode) .input:focus,
+:global(.night-mode) .textarea:focus {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(34, 197, 94, 0.6); /* Gece modunda green accent (butona uyumlu) */
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 12px 25px rgba(34, 197, 94, 0.2);
+}
+
+.input::placeholder, .textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.3s ease;
+}
+
+:global(.night-mode) .input::placeholder,
+:global(.night-mode) .textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.input:focus::placeholder, .textarea:focus::placeholder {
+  opacity: 0.6;
+}
+
+.textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 .errorMsg {
