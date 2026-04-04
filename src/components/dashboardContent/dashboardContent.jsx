@@ -66,9 +66,20 @@ function DashboardContent() {
       <div className={css.headerWrapper}>
         <h1 className={css.title}>Welcome {username || ""}</h1>
         <div className={css.navButtons}>
-          <button className={css.themeBtn} onClick={toggleTheme}>
-             {theme === 'day' ? '🏙️ Day Mode' : '🌌 Night Mode'}
-          </button>
+          <label className={css.themeSwitch} title="Toggle Theme">
+            <input 
+              type="checkbox" 
+              checked={theme === 'night'} 
+              onChange={toggleTheme} 
+              className={css.themeInput} 
+            />
+            <span className={css.slider}>
+              <span className={css.stars}></span>
+              <span className={css.iconMoon}>🌛</span>
+              <span className={css.iconSun}>🌞</span>
+              <span className={css.thumb}></span>
+            </span>
+          </label>
           <button
             className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}              onClick={() => navigate(`/dashboard/${userId}/history`)}
           >

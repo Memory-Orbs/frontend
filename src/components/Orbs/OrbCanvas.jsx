@@ -6,7 +6,7 @@ export const OrbCanvas = ({ children, hideControls = true }) => {
   return (
     <div style={{ 
       width: '100%', 
-      height: '450px', 
+      height: '350px', 
       position: 'relative' 
     }}>
       <Canvas 

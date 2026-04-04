@@ -14,20 +14,33 @@ const glassVertexShader = `
 `;
 
 const glassFragmentShader = `
+  uniform float uTotalPct;
   varying vec3 vNormal;
   varying vec3 vViewDir;
   void main() {
     float vDotN = dot(vViewDir, vNormal);
-    float fresnel = pow(clamp(1.0 - vDotN, 0.0, 1.0), 3.0);
+    float fresnel = pow(clamp(1.0 - vDotN, 0.0, 1.0), 2.5);
     vec3 reflectDir = reflect(-vViewDir, vNormal);
     vec2 matcapUv = reflectDir.xy * 0.5 + 0.5;
     float reflection = pow(1.0 - distance(matcapUv, vec2(0.5)), 3.0) * 0.5;
     vec3 lPos = normalize(vec3(-3.0, 6.0, 5.0));
-    float spec = pow(max(dot(vNormal, lPos), 0.0), 96.0) * 1.8;
-    float rim = pow(fresnel, 4.0) * 1.2;
-    vec3 baseCol = vec3(0.92, 0.96, 1.0);
-    vec3 finalColor = (baseCol * 0.08) + spec + reflection * 0.3;
-    float alpha = clamp(rim + spec + reflection * 0.15 + 0.04, 0.0, 0.85);
+    float spec = pow(max(dot(vNormal, lPos), 0.0), 96.0) * 1.5;
+    
+    // Kenar belirginliğini artırıyoruz
+    float rim = pow(fresnel, 2.5) * 2.0; 
+
+    // Widget bazlı gerçek "buzlu/sütlü" cam etkisi:
+    vec3 baseCol = vec3(1.0, 1.0, 1.0); 
+    
+    // Eğer orb doluysa (duygu seçilmişse) camı incelt, boşsa kalın (bembeyaz) kalsın
+    float glassBase = uTotalPct > 0.01 ? 0.15 : 0.85;
+    float baseAlpha = uTotalPct > 0.01 ? 0.05 : 0.40;
+
+    vec3 finalColor = (baseCol * glassBase) + spec + (reflection * 0.5);
+    
+    // Lebih açık cam (dolu iken) veya daha opak (boş iken)
+    float alpha = clamp(rim + spec + reflection * 0.2 + baseAlpha, 0.0, 1.0);
+    
     gl_FragColor = vec4(finalColor, alpha);
   }
 `;
@@ -172,7 +185,7 @@ export const Orb = ({
     uTime:   { value: 0 },
   }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const glassUniforms  = useMemo(() => ({ uTime: { value: 0 } }), []);
+  const glassUniforms  = useMemo(() => ({ uTime: { value: 0 }, uTotalPct: { value: 0 } }), []);
   const shadowUniforms = useMemo(() => ({ uOpacity: { value: 0.3 } }), []);
 
   useFrame((_state, delta) => {
@@ -192,7 +205,10 @@ export const Orb = ({
       u.uPct2.value = p2;
       u.uTime.value  = t;
     }
-    if (glassRef.current) glassRef.current.uniforms.uTime.value = t;
+    if (glassRef.current) {
+      glassRef.current.uniforms.uTime.value = t;
+      glassRef.current.uniforms.uTotalPct.value = propsRef.current.pct1 + propsRef.current.pct2;
+    }
 
     if (!isAnimating && !targetPosition) {
       groupRef.current.position.y = position[1] + Math.sin(t * 1.2) * 0.15;
