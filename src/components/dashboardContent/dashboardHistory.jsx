@@ -116,7 +116,7 @@ function DashboardHistory() {
 
   if (isLoading && orbs.length === 0) {
     return (
-      <div className={css.container}>
+      <div className={css.pageContent}>
         <h2 className={css.subtitle}>History (Orb Bookshelf)</h2>
         <p>Yükleniyor...</p>
       </div>
@@ -127,7 +127,7 @@ function DashboardHistory() {
   const incomingProps = incomingOrbState ? parseOrbData(incomingOrbState) : null;
 
   return (
-    <div className={css.container}>
+    <div className={css.pageContent}>
       <h2 className={css.subtitle}>Orb Bookshelf</h2>
       <p className={css.description}>
         Her küre bir günü temsil eder. Güncellemek için tıklayın.

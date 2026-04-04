@@ -55,7 +55,7 @@ function DashboardSettings() {
   };
 
   return (
-    <div className={css.container}>
+    <div className={css.pageContent}>
       <div className={css.settingsHeader}>
         <p className={css.description}>
           Update your personal information below. Your email address cannot be changed.

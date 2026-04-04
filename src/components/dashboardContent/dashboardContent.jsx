@@ -62,37 +62,34 @@ function DashboardContent() {
   }, [userId, navigate, dispatch, location.pathname]);
 
   return (
-    <>
-      <div className={css.container}>
-        <div className={css.headerWrapper}>
-          <h1 className={css.title}>Welcome {username || ""}</h1>
-          <div className={css.navButtons}>
-            <button className={css.themeBtn} onClick={toggleTheme}>
-               {theme === 'day' ? '🏙️ Day Mode' : '🌌 Night Mode'}
-            </button>
-            <button
-              className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}              onClick={() => navigate(`/dashboard/${userId}/history`)}
-            >
-              History
-            </button>
-            <button
-              className={`${css.navBtn} ${location.pathname.includes("/settings") ? css.activeNavBtn : ""}`}
-              onClick={() => navigate(`/dashboard/${userId}/settings`)}
-            >
-              Settings
-            </button>
-            <button
-              className={css.logoutBtn}
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
+    <div className={css.container}>
+      <div className={css.headerWrapper}>
+        <h1 className={css.title}>Welcome {username || ""}</h1>
+        <div className={css.navButtons}>
+          <button className={css.themeBtn} onClick={toggleTheme}>
+             {theme === 'day' ? '🏙️ Day Mode' : '🌌 Night Mode'}
+          </button>
+          <button
+            className={`${css.navBtn} ${location.pathname.includes("/history") ? css.activeNavBtn : ""}`}              onClick={() => navigate(`/dashboard/${userId}/history`)}
+          >
+            History
+          </button>
+          <button
+            className={`${css.navBtn} ${location.pathname.includes("/settings") ? css.activeNavBtn : ""}`}
+            onClick={() => navigate(`/dashboard/${userId}/settings`)}
+          >
+            Settings
+          </button>
+          <button
+            className={css.logoutBtn}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         </div>
-
       </div>
       <Outlet />
-    </>
+    </div>
   );
 }
 export default DashboardContent;

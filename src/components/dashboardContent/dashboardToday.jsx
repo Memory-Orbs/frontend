@@ -104,7 +104,7 @@ function DashboardToday() {
   };
 
   return (
-    <div className={css.container}>
+    <div className={css.pageContent}>
       <h2 className={css.subtitle}>Today's Orb</h2>
       <p className={css.description}>
         Select at least two emotions that describe your day. Watch your orb fill!
