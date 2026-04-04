@@ -33,6 +33,9 @@ function DashboardToday() {
 
   const getOrbState = () => {
     const validEmotions = emotions.filter((e) => e.type !== "");
+    let totalPct = validEmotions.reduce((sum, e) => sum + Number(e.percentage || 0), 0) / 100;
+    totalPct = Math.min(Math.max(totalPct, 0), 1);
+
     if (validEmotions.length === 0) {
       return {
         color1: EMOTION_COLORS.empty,
@@ -45,17 +48,20 @@ function DashboardToday() {
         color1: EMOTION_COLORS[validEmotions[0].type],
         color2: EMOTION_COLORS[validEmotions[0].type],
         ratio: 0.5,
-        fill: 1,
+        fill: totalPct,
       };
     } else {
       const type1 = validEmotions[0].type;
       const type2 = validEmotions[1].type;
       const pct1 = Number(validEmotions[0].percentage);
+      const pct2 = Number(validEmotions[1].percentage);
+      const ratio = (pct1 + pct2 > 0) ? (pct1 / (pct1 + pct2)) : 0.5;
+
       return {
         color1: EMOTION_COLORS[type1],
         color2: EMOTION_COLORS[type2],
-        ratio: pct1 / 100,
-        fill: 1,
+        ratio: ratio,
+        fill: totalPct,
       };
     }
   };

@@ -18,47 +18,65 @@ const glassVertexShader = `
 const glassFragmentShader = `
   varying vec3 vNormal;
   varying vec3 vViewDir;
-  varying vec3 vWorldNormal;
   uniform float uTime;
 
   void main() {
     float vDotN = dot(vViewDir, vNormal);
     float fresnel = pow(clamp(1.0 - vDotN, 0.0, 1.0), 3.0);
     
-    // 1. Matcap Style Reflections (Fake World Space)
-    // Bu, kürenin üzerine kavisli bir stüdyo yansıması ekleyerek 3D hacmi belirginleştirir.
     vec3 reflectDir = reflect(-vViewDir, vNormal);
-    float m = 2.0 * sqrt(pow(reflectDir.x, 2.0) + pow(reflectDir.y, 2.0) + pow(reflectDir.z + 1.0, 2.0));
-    vec2 matcapUv = reflectDir.xy / m + 0.5;
-    float reflection = pow(1.0 - distance(matcapUv, vec2(0.5)), 3.0) * 0.4;
+    vec2 matcapUv = reflectDir.xy * 0.5 + 0.5;
+    float reflection = pow(1.0 - distance(matcapUv, vec2(0.5)), 3.0) * 0.6;
     
-    // 2. Specular Highlights (Top-Left & Sharp Glint)
     vec3 lPos = normalize(vec3(-5.0, 8.0, 5.0));
-    float spec = pow(max(dot(vNormal, lPos), 0.0), 128.0) * 2.0;
+    float spec = pow(max(dot(vNormal, lPos), 0.0), 128.0) * 2.5;
     
-    // 3. Ambient Occlusion Overlay (Kürenin kendi üzerindeki gölgesi)
-    float ao = smoothstep(0.3, -0.6, vNormal.y) * 0.25;
+    vec3 lPos2 = normalize(vec3(5.0, -2.0, -5.0));
+    float spec2 = pow(max(dot(vNormal, lPos2), 0.0), 64.0) * 0.8;
     
-    // 4. Rim Lighting (3D Kenar Işığı)
-    float rim = pow(fresnel, 4.0) * 0.8;
+    float rim = pow(fresnel, 5.0) * 1.5;
+    vec3 baseCol = vec3(0.92, 0.96, 1.0);
+    vec3 finalColor = (baseCol * 0.1) + spec + spec2 + reflection * 0.4;
     
-    vec3 baseCol = vec3(0.96, 0.98, 1.0);
-    vec3 finalColor = baseCol + spec + reflection - ao;
+    float alpha = clamp(rim + spec + spec2 + reflection * 0.2 + 0.05, 0.0, 1.0);
+    float contour = pow(fresnel, 20.0) * 0.8;
     
-    // Beyaz zeminde kontur belirginleştirme
-    float contour = pow(fresnel, 20.0) * 0.5;
-    
-    gl_FragColor = vec4(finalColor - contour, clamp(rim + spec * 0.6 + reflection * 0.3 + 0.05, 0.0, 1.0));
+    gl_FragColor = vec4(finalColor - contour * 0.2, alpha);
   }
 `;
 
 const innerVertexShader = `
   varying vec3 vNormal;
   varying vec3 vPosition;
+  varying float vIsSurface;
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform float uFill;
+
   void main() {
-    vNormal = normalize(normalMatrix * normal);
-    vPosition = position;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vUv = uv;
+    float targetHeight = -0.95 + (clamp(uFill, 0.0, 1.0) * 1.9); 
+    
+    vec3 pos = position;
+    float wave = sin(pos.x * 6.0 + uTime * 2.0) * cos(pos.z * 6.0 + uTime * 1.5) * 0.03;
+    float surfaceY = targetHeight + wave;
+    
+    vIsSurface = 0.0;
+    vec3 newNormal = normal;
+    
+    if (pos.y > surfaceY) {
+      pos.y = surfaceY;
+      vIsSurface = 1.0;
+      newNormal = normalize(vec3(
+         sin(pos.x * 15.0 + uTime * 3.0) * 0.1, 
+         1.0, 
+         cos(pos.z * 15.0 + uTime * 3.0) * 0.1
+      ));
+    }
+    
+    vNormal = normalize(normalMatrix * newNormal);
+    vPosition = pos;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   }
 `;
 
@@ -70,18 +88,44 @@ const innerFragmentShader = `
   uniform float uFill;
   varying vec3 vNormal;
   varying vec3 vPosition;
+  varying float vIsSurface;
 
   void main() {
-    float t = uTime * 0.4;
-    // Plasma Noise
-    float n = sin(vPosition.x * 2.0 + t) * cos(vPosition.z * 2.0 - t + sin(t)) * 0.5 + 0.5;
-    vec3 color = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.4, 0.0, 1.0));
+    float t = uTime * 0.5;
     
-    // 3D Inner Volume - Bakış açısına göre değişen derinlik
-    float intensity = pow(dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
-    float verticalGrad = smoothstep(-1.2, 0.8, vPosition.y); // Alt tarafı daha koyu
+    float n = sin(vPosition.x * 3.0 + t) * cos(vPosition.z * 3.0 - t + sin(t*0.5)) * 0.5 + 0.5;
+    vec3 baseCol = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.4, 0.0, 1.0));
     
-    gl_FragColor = vec4(color * (0.2 + 0.8 * intensity) * verticalGrad, uFill);
+    float depthGrad = smoothstep(-1.0, 0.8, vPosition.y); 
+    vec3 liquidColor = baseCol * (0.3 + 0.7 * depthGrad);
+
+    float viewDot = dot(normalize(vNormal), vec3(0.0, 0.0, 1.0));
+    float edgeIntensity = pow(1.0 - abs(viewDot), 2.0);
+
+    vec3 finalColor;
+    
+    if (vIsSurface > 0.5) {
+      finalColor = baseCol * 1.1; 
+      
+      float spec = pow(max(dot(normalize(vNormal), normalize(vec3(-2.0, 5.0, 2.0))), 0.0), 32.0);
+      finalColor += vec3(spec * 0.8);
+
+      float currentRadius = length(vPosition.xz);
+      // sphere radius is 0.98. Maximum theoretical xz radius at level Y
+      float maxRadius = sqrt(max(0.98*0.98 - vPosition.y*vPosition.y, 0.001)) * 0.98;
+      float ring = smoothstep(maxRadius - 0.04, maxRadius, currentRadius);
+      finalColor += baseCol * ring * 1.5;
+    } else {
+      finalColor = liquidColor + (baseCol * edgeIntensity * 0.6);
+      
+      vec3 modPos = vPosition * 8.0 + vec3(0.0, uTime * -1.5, 0.0);
+      float bubble = sin(modPos.x) * cos(modPos.y) * sin(modPos.z);
+      if (bubble > 0.95 && vPosition.y < (uFill*1.8 - 0.9 - 0.1)) {
+        finalColor += vec3(0.4); 
+      }
+    }
+    
+    gl_FragColor = vec4(finalColor, 0.92);
   }
 `;
 
@@ -168,10 +212,7 @@ export const Orb = ({
     if (innerMeshRef.current) {
       if (fill > 0.01) {
         innerMeshRef.current.visible = true;
-        // Kırılma etkisi (Kenarlarda hafif büyüme)
-        const pulse = Math.sin(t * 2.5) * 0.015;
-        const innerScale = 0.88 + pulse;
-        innerMeshRef.current.scale.setScalar(innerScale);
+        innerMeshRef.current.scale.setScalar(1.0);
       } else {
         innerMeshRef.current.visible = false;
       }
@@ -212,9 +253,9 @@ export const Orb = ({
           />
         </mesh>
         
-        {/* Refractive Inner Core */}
+        {/* Refractive Inner Core (Liquid) */}
         <mesh ref={innerMeshRef}>
-          <sphereGeometry args={[0.99, 32, 32]} />
+          <sphereGeometry args={[0.98, 64, 64]} />
           <shaderMaterial
             ref={materialRef}
             vertexShader={innerVertexShader}
