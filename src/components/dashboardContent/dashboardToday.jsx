@@ -45,7 +45,7 @@ function DashboardToday() {
       };
     } else if (validEmotions.length === 1) {
       return {
-        color1: EMOTION_COLORS[validEmotions[0].type],
+        color1: EMOTION_COLORS[validEmotions[0].type.toLowerCase()],
         color2: defaultColor,
         pct1: Number(validEmotions[0].percentage) / 100,
         pct2: 0,
@@ -58,8 +58,8 @@ function DashboardToday() {
       const pct2 = Number(validEmotions[1].percentage) / 100;
 
       return {
-        color1: EMOTION_COLORS[type1],
-        color2: EMOTION_COLORS[type2],
+        color1: EMOTION_COLORS[type1.toLowerCase()],
+        color2: EMOTION_COLORS[type2.toLowerCase()],
         pct1: pct1,
         pct2: pct2,
         fill: 1.0,

@@ -100,11 +100,11 @@ function DashboardHistory() {
     const defaultColor = "#e2e8f0";
 
     if (validEmotions.length === 0) return { color1: defaultColor, color2: defaultColor, pct1: 0, pct2: 0, fill: 1.0 };
-    if (validEmotions.length === 1) return { color1: EMOTION_COLORS[validEmotions[0].type], color2: defaultColor, pct1: Number(validEmotions[0].percentage) / 100, pct2: 0, fill: 1.0 };
+    if (validEmotions.length === 1) return { color1: EMOTION_COLORS[validEmotions[0].type.toLowerCase()], color2: defaultColor, pct1: Number(validEmotions[0].percentage) / 100, pct2: 0, fill: 1.0 };
     
     return {
-      color1: EMOTION_COLORS[validEmotions[0].type] || defaultColor,
-      color2: EMOTION_COLORS[validEmotions[1].type] || defaultColor,
+      color1: EMOTION_COLORS[validEmotions[0].type.toLowerCase()] || defaultColor,
+      color2: EMOTION_COLORS[validEmotions[1].type.toLowerCase()] || defaultColor,
       pct1: Number(validEmotions[0].percentage) / 100,
       pct2: Number(validEmotions[1].percentage) / 100,
       fill: 1.0,
