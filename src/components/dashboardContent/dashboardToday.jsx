@@ -32,36 +32,37 @@ function DashboardToday() {
   };
 
   const getOrbState = () => {
+    const defaultColor = "#e2e8f0";
     const validEmotions = emotions.filter((e) => e.type !== "");
-    let totalPct = validEmotions.reduce((sum, e) => sum + Number(e.percentage || 0), 0) / 100;
-    totalPct = Math.min(Math.max(totalPct, 0), 1);
 
     if (validEmotions.length === 0) {
       return {
-        color1: EMOTION_COLORS.empty,
-        color2: EMOTION_COLORS.empty,
-        ratio: 0.5,
-        fill: 0,
+        color1: defaultColor,
+        color2: defaultColor,
+        pct1: 0,
+        pct2: 0,
+        fill: 1.0,
       };
     } else if (validEmotions.length === 1) {
       return {
         color1: EMOTION_COLORS[validEmotions[0].type],
-        color2: EMOTION_COLORS[validEmotions[0].type],
-        ratio: 0.5,
-        fill: totalPct,
+        color2: defaultColor,
+        pct1: Number(validEmotions[0].percentage) / 100,
+        pct2: 0,
+        fill: 1.0,
       };
     } else {
       const type1 = validEmotions[0].type;
       const type2 = validEmotions[1].type;
-      const pct1 = Number(validEmotions[0].percentage);
-      const pct2 = Number(validEmotions[1].percentage);
-      const ratio = (pct1 + pct2 > 0) ? (pct1 / (pct1 + pct2)) : 0.5;
+      const pct1 = Number(validEmotions[0].percentage) / 100;
+      const pct2 = Number(validEmotions[1].percentage) / 100;
 
       return {
         color1: EMOTION_COLORS[type1],
         color2: EMOTION_COLORS[type2],
-        ratio: ratio,
-        fill: totalPct,
+        pct1: pct1,
+        pct2: pct2,
+        fill: 1.0,
       };
     }
   };

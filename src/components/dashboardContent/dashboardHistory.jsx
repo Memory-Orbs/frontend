@@ -97,14 +97,17 @@ function DashboardHistory() {
 
   const parseOrbData = (orb) => {
     const validEmotions = (orb.emotions || []).filter((e) => e.type !== "");
-    if (validEmotions.length === 0) return { color1: EMOTION_COLORS.empty, color2: EMOTION_COLORS.empty, ratio: 0.5, fill: 0 };
-    if (validEmotions.length === 1) return { color1: EMOTION_COLORS[validEmotions[0].type], color2: EMOTION_COLORS[validEmotions[0].type], ratio: 0.5, fill: 1 };
+    const defaultColor = "#e2e8f0";
+
+    if (validEmotions.length === 0) return { color1: defaultColor, color2: defaultColor, pct1: 0, pct2: 0, fill: 1.0 };
+    if (validEmotions.length === 1) return { color1: EMOTION_COLORS[validEmotions[0].type], color2: defaultColor, pct1: Number(validEmotions[0].percentage) / 100, pct2: 0, fill: 1.0 };
     
     return {
-      color1: EMOTION_COLORS[validEmotions[0].type] || EMOTION_COLORS.empty,
-      color2: EMOTION_COLORS[validEmotions[1].type] || EMOTION_COLORS.empty,
-      ratio: Number(validEmotions[0].percentage) / 100,
-      fill: 1,
+      color1: EMOTION_COLORS[validEmotions[0].type] || defaultColor,
+      color2: EMOTION_COLORS[validEmotions[1].type] || defaultColor,
+      pct1: Number(validEmotions[0].percentage) / 100,
+      pct2: Number(validEmotions[1].percentage) / 100,
+      fill: 1.0,
     };
   };
 

@@ -83,7 +83,8 @@ const innerVertexShader = `
 const innerFragmentShader = `
   uniform vec3 uColor1;
   uniform vec3 uColor2;
-  uniform float uRatio;
+  uniform float uPct1;
+  uniform float uPct2;
   uniform float uTime;
   uniform float uFill;
   varying vec3 vNormal;
@@ -93,9 +94,31 @@ const innerFragmentShader = `
   void main() {
     float t = uTime * 0.5;
     
-    float n = sin(vPosition.x * 3.0 + t) * cos(vPosition.z * 3.0 - t + sin(t*0.5)) * 0.5 + 0.5;
-    vec3 baseCol = mix(uColor1, uColor2, clamp(uRatio + (n - 0.5) * 0.4, 0.0, 1.0));
+    // Normalized height (0 to 1) roughly
+    float h = (vPosition.y / 0.98 + 1.0) * 0.5;
+
+    vec3 defaultColor = vec3(0.85, 0.9, 0.95);
+    vec3 baseCol;
     
+    float blend = 0.05;
+    float noise = sin(vPosition.x * 5.0 + t) * cos(vPosition.z * 5.0 - t) * 0.02;
+    float hNoise = h + noise;
+    
+    vec3 col1_2 = mix(uColor1, uColor2, smoothstep(uPct1 - blend, uPct1 + blend, hNoise));
+    float topMixThreshold = uPct1 + max(uPct2, 0.0);
+    float mix2 = smoothstep(topMixThreshold - blend, topMixThreshold + blend, hNoise);
+    
+    if (uPct2 < 0.001) {
+       col1_2 = uColor1;
+       mix2 = smoothstep(uPct1 - blend, uPct1 + blend, hNoise);
+    }
+    
+    if (uPct1 <= 0.0 && uPct2 <= 0.0) {
+       baseCol = defaultColor;
+    } else {
+       baseCol = mix(col1_2, defaultColor, mix2);
+    }
+
     float depthGrad = smoothstep(-1.0, 0.8, vPosition.y); 
     vec3 liquidColor = baseCol * (0.3 + 0.7 * depthGrad);
 
@@ -111,7 +134,6 @@ const innerFragmentShader = `
       finalColor += vec3(spec * 0.8);
 
       float currentRadius = length(vPosition.xz);
-      // sphere radius is 0.98. Maximum theoretical xz radius at level Y
       float maxRadius = sqrt(max(0.98*0.98 - vPosition.y*vPosition.y, 0.001)) * 0.98;
       float ring = smoothstep(maxRadius - 0.04, maxRadius, currentRadius);
       finalColor += baseCol * ring * 1.5;
@@ -120,12 +142,15 @@ const innerFragmentShader = `
       
       vec3 modPos = vPosition * 8.0 + vec3(0.0, uTime * -1.5, 0.0);
       float bubble = sin(modPos.x) * cos(modPos.y) * sin(modPos.z);
-      if (bubble > 0.95 && vPosition.y < (uFill*1.8 - 0.9 - 0.1)) {
+      if (bubble > 0.95 && hNoise < (uPct1 + uPct2)) {
         finalColor += vec3(0.4); 
       }
     }
     
-    gl_FragColor = vec4(finalColor, 0.92);
+    float alpha = mix(0.7, 0.95, 1.0 - mix2);
+    if (uPct1 <= 0.0 && uPct2 <= 0.0) alpha = 0.7;
+    
+    gl_FragColor = vec4(finalColor, alpha);
   }
 `;
 
@@ -145,8 +170,10 @@ const shadowFragmentShader = `
 export const Orb = ({ 
   color1 = "#ffffff", 
   color2 = "#ffffff", 
+  pct1 = 0,
+  pct2 = 0,
   ratio = 0.5, 
-  fill = 0, 
+  fill = 1, 
   scale = 1,
   position = [0, 0, 0],
   isAnimating = false, 
@@ -165,6 +192,8 @@ export const Orb = ({
   const uniforms = useMemo(() => ({
     uColor1: { value: new THREE.Color(color1) },
     uColor2: { value: new THREE.Color(color2) },
+    uPct1: { value: pct1 },
+    uPct2: { value: pct2 },
     uRatio: { value: ratio },
     uTime: { value: 0 },
     uFill: { value: fill }
@@ -177,10 +206,12 @@ export const Orb = ({
     if (materialRef.current) {
       materialRef.current.uniforms.uColor1.value.set(new THREE.Color(color1));
       materialRef.current.uniforms.uColor2.value.set(new THREE.Color(color2));
+      materialRef.current.uniforms.uPct1.value = pct1;
+      materialRef.current.uniforms.uPct2.value = pct2;
       materialRef.current.uniforms.uRatio.value = ratio;
       materialRef.current.uniforms.uFill.value = fill;
     }
-  }, [color1, color2, ratio, fill]);
+  }, [color1, color2, pct1, pct2, ratio, fill]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
