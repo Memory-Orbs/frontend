@@ -460,6 +460,125 @@
   color: white;
 }
 
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+
+.viewSelector {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:global(.night-mode) .viewSelector {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.selectorBtn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.selectorBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global(.night-mode) .selectorBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.activeBtn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+:global(.night-mode) .activeBtn {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.canvasWrapper {
+  width: 100%;
+  height: 600px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+:global(.night-mode) .canvasWrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.orbLabel {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 24px;
+}
+
+:global(.night-mode) .loadingOverlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+:global(.night-mode) .spinner {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .formGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -472,4 +591,24 @@
   cursor: not-allowed;
   color: #6c757d;
   border-color: #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .historyHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .viewSelector {
+    width: 100%;
+  }
+  
+  .selectorBtn {
+    flex: 1;
+  }
+  
+  .canvasWrapper {
+    height: 450px;
+  }
 }

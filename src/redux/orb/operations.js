@@ -47,6 +47,7 @@ export const addOrb = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.token;
+      console.log("Sending addOrb payload:", credentials);
 
       const response = await axios.post("/orbs", credentials, {
         headers: {
@@ -57,7 +58,8 @@ export const addOrb = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+      console.error("addOrb error response data:", error.response?.data);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.response?.data || error.message);
     }
   },
 );

@@ -53,6 +53,7 @@ export const authSlice = createSlice({
         const { user, token } = action.payload;
 
         state.user = {
+          _id: user?._id || null,
           name: user?.name || null,
           surname: user?.surname || null,
           email: user?.email || null,

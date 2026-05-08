@@ -12,7 +12,7 @@ import { TubeStructure, AnimatedTubeOrb } from "../Orbs/Tube";
 function DashboardToday() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userId = useSelector((state) => state.auth.user.id);
+  const userId = useSelector((state) => state.auth.user._id);
 
   const [emotions, setEmotions] = useState([
     { type: "", percentage: 50 },
@@ -25,8 +25,10 @@ function DashboardToday() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const handleEmotionChange = (index, field, value) => {
-    const updated = [...emotions];
-    updated[index][field] = value;
+    console.log("Emotion changed:", index, field, value);
+    const updated = emotions.map((emo, i) => 
+      i === index ? { ...emo, [field]: value } : emo
+    );
     setEmotions(updated);
     setError(null);
   };
@@ -70,21 +72,35 @@ function DashboardToday() {
   const orbState = getOrbState();
 
   const handleAnimationComplete = async () => {
+    const filteredEmotions = emotions.filter(e => e.type !== "");
+    
+    console.log("Filtered Emotions:", filteredEmotions);
+
+    if (filteredEmotions.length === 0) {
+      setError("Please select at least one emotion.");
+      setIsSubmitting(false);
+      setIsAnimating(false);
+      return;
+    }
+
     const payload = {
       date: new Date().toISOString().split("T")[0],
-      emotions: emotions.map((e) => ({
+      emotions: filteredEmotions.map((e) => ({
         type: e.type,
         percentage: Number(e.percentage),
       })),
-      note,
+      note: note.trim(),
       animationSeed: Math.floor(Math.random() * 100000),
     };
+
+    console.log("Final Payload being dispatched:", JSON.stringify(payload, null, 2));
 
     try {
       await dispatch(addOrb(payload)).unwrap();
       toast.success("Today's orb created successfully");
       navigate(`/dashboard/${userId}/history`, { state: { incomingOrb: payload } });
     } catch (err) {
+      console.error("Add orb failed. Server response:", err);
       setError(err?.message || "Today's orb already exists or something went wrong.");
       setIsSubmitting(false);
       setIsAnimating(false);
@@ -94,15 +110,17 @@ function DashboardToday() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const total = emotions.reduce((sum, e) => sum + Number(e.percentage), 0);
-
-    if (total !== 100) {
-      setError("Emotion percentages must total 100%.");
+    const filteredEmotions = emotions.filter(e => e.type !== "");
+    
+    if (filteredEmotions.length === 0) {
+      setError("Please select at least one emotion.");
       return;
     }
 
-    if (emotions.some((e) => !e.type)) {
-      setError("Please select emotion types.");
+    const total = filteredEmotions.reduce((sum, e) => sum + Number(e.percentage), 0);
+
+    if (total !== 100) {
+      setError("Selected emotion percentages must total 100%.");
       return;
     }
 
@@ -143,7 +161,7 @@ function DashboardToday() {
                 <option value="">Select emotion</option>
                 {EMOTIONS.map((emo) => (
                   <option key={emo} value={emo}>
-                    {emo}
+                    {emo.charAt(0).toUpperCase() + emo.slice(1)}
                   </option>
                 ))}
               </select>

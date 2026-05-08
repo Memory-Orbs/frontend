@@ -1,19 +1,19 @@
 export const EMOTIONS = [
-  "Joy",
-  "Sadness",
-  "Angry",
-  "Disgust",
-  "Fear",
-  "Anxiety",
-  "Envy",
-  "Ennui",
-  "Embarrassment",
+  "joy",
+  "sadness",
+  "anger",
+  "disgust",
+  "fear",
+  "anxiety",
+  "envy",
+  "ennui",
+  "embarrassment",
 ];
 
 export const EMOTION_COLORS = {
   joy: "#FDE047", // Yellow
   sadness: "#3B82F6", // Blue
-  angry: "#EF4444", // Red
+  anger: "#EF4444", // Red
   disgust: "#22C55E", // Green
   fear: "#A855F7", // Purple
   anxiety: "#F97316", // Orange
