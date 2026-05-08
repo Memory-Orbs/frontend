@@ -160,7 +160,8 @@ export const Orb = ({
   isAnimating = false,
   targetPosition = null,
   onAnimationComplete = null,
-  onClick = null
+  onClick = null,
+  idle = true
 }) => {
   const groupRef     = useRef();
   const innerMeshRef = useRef();
@@ -171,9 +172,9 @@ export const Orb = ({
   const [hovered, setHovered] = useState(false);
 
   // Keep latest props in a ref so useFrame always sees current values
-  const propsRef = useRef({ color1, color2, pct1, pct2, fill, scale });
+  const propsRef = useRef({ color1, color2, pct1, pct2, fill, scale, idle });
   useEffect(() => {
-    propsRef.current = { color1, color2, pct1, pct2, fill, scale };
+    propsRef.current = { color1, color2, pct1, pct2, fill, scale, idle };
   });
 
   // Uniforms created ONCE — mutated directly every frame
@@ -210,7 +211,7 @@ export const Orb = ({
       glassRef.current.uniforms.uTotalPct.value = propsRef.current.pct1 + propsRef.current.pct2;
     }
 
-    if (!isAnimating && !targetPosition) {
+    if (!isAnimating && !targetPosition && propsRef.current.idle) {
       groupRef.current.position.y = position[1] + Math.sin(t * 1.2) * 0.15;
       groupRef.current.rotation.y += dt * 0.25;
 
@@ -221,6 +222,11 @@ export const Orb = ({
         shadowRef.current.material.uniforms.uOpacity.value =
           Math.min(Math.max(0.35 - Math.sin(t * 1.2) * 0.1, 0), 1);
       }
+    } else if (!isAnimating && !targetPosition && !propsRef.current.idle) {
+      // If idle is false, ensure it stays at the base position
+      groupRef.current.position.y = position[1];
+      // We don't reset rotation here to keep current orientation, 
+      // or we can set it to a fixed value.
     }
 
     const { fill: f, scale: sc } = propsRef.current;

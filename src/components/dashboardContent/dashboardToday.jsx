@@ -136,7 +136,7 @@ function DashboardToday() {
       </p>
 
       {/* 3D Canvas rendering the Orb and Tube */}
-      <OrbCanvas>
+      <OrbCanvas cameraZ={6}>
         <TubeStructure visible={isAnimating} />
         
         {isAnimating ? (

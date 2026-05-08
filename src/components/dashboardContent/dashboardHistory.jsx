@@ -13,17 +13,27 @@ import { TubeStructure, AnimatedTubeOrb } from "../Orbs/Tube";
 import { EMOTION_COLORS } from "../../utils/colorUtils";
 
 // Improved Shelf position calculator for high-fidelity browse experience
-const calculateShelfPosition = (index, total) => {
-  const itemsPerRow = 5;
-  const xGap = 3.5;
-  const yGap = 3.8;
+const calculateShelfPosition = (index, total, viewRange) => {
+  let itemsPerRow = 5;
+  let xGap = 3.5;
+  let yGap = 4.0;
+  
+  if (viewRange === 'month') {
+    itemsPerRow = 7;
+    xGap = 2.8;
+    yGap = 3.0;
+  } else if (viewRange === 'year') {
+    itemsPerRow = 15;
+    xGap = 1.4;
+    yGap = 1.6;
+  }
   
   const col = index % itemsPerRow;
   const row = Math.floor(index / itemsPerRow);
+  const totalRows = Math.ceil(total / itemsPerRow);
   
-  // Center the grid horizontally
   const startX = -((itemsPerRow - 1) * xGap) / 2;
-  const startY = 2; // Start from top
+  const startY = ((totalRows - 1) * yGap) / 2;
 
   return new THREE.Vector3(startX + col * xGap, startY - row * yGap, 0);
 };
@@ -55,12 +65,13 @@ function DashboardHistory() {
     
     for (let i = 0; i < totalDays; i++) {
       const d = new Date(today);
-      d.setDate(d.getDate() - i);
+      // Change: Calculate date such that i=0 is the oldest day in the range
+      d.setDate(d.getDate() - (totalDays - 1 - i));
       days.push({
         dateStr: d.toDateString(),
         dayLabel: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
         index: i,
-        position: calculateShelfPosition(i, totalDays),
+        position: calculateShelfPosition(i, totalDays, viewRange),
       });
     }
     return days;
@@ -113,6 +124,10 @@ function DashboardHistory() {
 
   const incomingProps = incomingOrbState ? parseOrbData(incomingOrbState) : null;
 
+  const orbScale = viewRange === 'week' ? 0.9 : viewRange === 'month' ? 0.65 : 0.35;
+  const cameraZ = viewRange === 'week' ? 20 : viewRange === 'month' ? 22 : 35;
+  const canvasHeight = viewRange === 'week' ? '500px' : viewRange === 'month' ? '1200px' : '4000px';
+
   return (
     <div className={css.pageContent}>
       <div className={css.historyHeader}>
@@ -136,7 +151,11 @@ function DashboardHistory() {
       </div>
 
       <div className={css.canvasWrapper}>
-        <OrbCanvas hideControls={false}>
+        <OrbCanvas 
+          hideControls={true} 
+          height={canvasHeight}
+          cameraZ={cameraZ}
+        >
           {animatingIncoming && <TubeStructure visible={true} />}
           
           {animatingIncoming && incomingProps && (
@@ -146,15 +165,15 @@ function DashboardHistory() {
                 onComplete={() => setIncomingTubeDone(true)}
                 duration={2.5}
               >
-                <Orb {...incomingProps} scale={1} />
+                <Orb {...incomingProps} scale={orbScale} />
               </AnimatedTubeOrb>
             ) : (
               <Orb 
                 {...incomingProps} 
-                scale={1} 
+                scale={orbScale} 
                 isAnimating={true}
                 position={[0,0,2]}
-                targetPosition={shelfDays[0].position}
+                targetPosition={shelfDays[shelfDays.length - 1].position}
                 onAnimationComplete={() => setAnimatingIncoming(false)}
               />
             )
@@ -168,7 +187,8 @@ function DashboardHistory() {
               <group key={day.dateStr} position={[day.position.x, day.position.y, day.position.z]}>
                 <Orb
                   {...props}
-                  scale={0.9}
+                  scale={orbScale}
+                  idle={false}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOrbClick(day.dateStr);

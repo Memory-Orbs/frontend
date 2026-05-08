@@ -2,17 +2,17 @@ import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
-export const OrbCanvas = ({ children, hideControls = true }) => {
+export const OrbCanvas = ({ children, hideControls = true, height = '350px', cameraZ = 8 }) => {
   return (
     <div style={{ 
       width: '100%', 
-      height: '350px', 
+      height: height, 
       position: 'relative' 
     }}>
       <Canvas 
         shadows={false}
-        dpr={[1, 1.5]} 
-        camera={{ position: [0, 0, 6], fov: 45 }}
+        dpr={[1, 2]} 
+        camera={{ position: [0, 0, cameraZ], fov: 45 }}
         gl={{ 
           antialias: true,
           alpha: true,

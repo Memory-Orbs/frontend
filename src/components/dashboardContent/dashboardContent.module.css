@@ -514,17 +514,43 @@
 
 .canvasWrapper {
   width: 100%;
-  height: 600px;
+  min-height: 400px;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 24px;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow-y: auto;
   position: relative;
+}
+
+.canvasWrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.canvasWrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0 24px 24px 0;
+}
+
+.canvasWrapper::-webkit-scrollbar-thumb {
+  background: rgba(86, 34, 102, 0.2);
+  border-radius: 10px;
+}
+
+.canvasWrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(86, 34, 102, 0.4);
 }
 
 :global(.night-mode) .canvasWrapper {
   background: rgba(255, 255, 255, 0.02);
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+:global(.night-mode) .canvasWrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:global(.night-mode) .canvasWrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .orbLabel {
