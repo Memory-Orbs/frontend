@@ -14,18 +14,13 @@ import { EMOTION_COLORS } from "../../utils/colorUtils";
 
 // Improved Shelf position calculator for high-fidelity browse experience
 const calculateShelfPosition = (index, total, viewRange) => {
-  let itemsPerRow = 5;
-  let xGap = 3.5;
-  let yGap = 4.0;
+  const itemsPerRow = 7;
+  let xGap = 3.0;
+  let yGap = 3.5;
   
-  if (viewRange === 'month') {
-    itemsPerRow = 7;
-    xGap = 2.8;
-    yGap = 3.0;
-  } else if (viewRange === 'year') {
-    itemsPerRow = 15;
-    xGap = 1.4;
-    yGap = 1.6;
+  if (viewRange === 'year') {
+    xGap = 1.2;
+    yGap = 1.4;
   }
   
   const col = index % itemsPerRow;
@@ -51,7 +46,6 @@ function DashboardHistory() {
   const [animatingIncoming, setAnimatingIncoming] = useState(!!incomingOrbState);
   const [incomingTubeDone, setIncomingTubeDone] = useState(false);
 
-  // View range state (week, month, year)
   const [viewRange, setViewRange] = useState('month');
 
   useEffect(() => {
@@ -60,19 +54,66 @@ function DashboardHistory() {
 
   const shelfDays = useMemo(() => {
     const days = [];
-    const today = new Date();
-    let totalDays = viewRange === 'year' ? 365 : viewRange === 'month' ? 30 : 7;
+    const now = new Date();
     
-    for (let i = 0; i < totalDays; i++) {
-      const d = new Date(today);
-      // Change: Calculate date such that i=0 is the oldest day in the range
-      d.setDate(d.getDate() - (totalDays - 1 - i));
-      days.push({
-        dateStr: d.toDateString(),
-        dayLabel: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
-        index: i,
-        position: calculateShelfPosition(i, totalDays, viewRange),
-      });
+    if (viewRange === 'week') {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(now.getFullYear(), now.getMonth(), diff);
+      monday.setHours(0,0,0,0);
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        days.push({
+          dateStr: d.toDateString(),
+          dayLabel: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
+          index: i,
+          position: calculateShelfPosition(i, 7, viewRange),
+        });
+      }
+    } else if (viewRange === 'month') {
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const totalInMonth = lastDay.getDate();
+
+      const firstDayOfWeek = firstDay.getDay(); 
+      const padding = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+      const totalSlots = totalInMonth + padding;
+
+      for (let i = 0; i < totalSlots; i++) {
+        const d = new Date(firstDay);
+        d.setDate(firstDay.getDate() + (i - padding));
+        const isCurrentMonth = d.getMonth() === now.getMonth();
+
+        days.push({
+          dateStr: d.toDateString(),
+          dayLabel: isCurrentMonth ? d.getDate().toString() : '',
+          index: i,
+          position: calculateShelfPosition(i, totalSlots, viewRange),
+          isCurrentMonth
+        });
+      }
+    } else {
+      // Year: 7 columns, ~52 rows
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const startDayOfWeek = startOfYear.getDay();
+      const padding = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+      const totalDays = 365 + padding;
+
+      for (let i = 0; i < totalDays; i++) {
+        const d = new Date(startOfYear);
+        d.setDate(startOfYear.getDate() + (i - padding));
+        const isCurrentYear = d.getFullYear() === now.getFullYear();
+
+        days.push({
+          dateStr: d.toDateString(),
+          dayLabel: isCurrentYear && d.getDate() === 1 ? d.toLocaleDateString('tr-TR', { month: 'short' }) : '',
+          index: i,
+          position: calculateShelfPosition(i, totalDays, viewRange),
+          isCurrentYear
+        });
+      }
     }
     return days;
   }, [viewRange]);
@@ -124,9 +165,9 @@ function DashboardHistory() {
 
   const incomingProps = incomingOrbState ? parseOrbData(incomingOrbState) : null;
 
-  const orbScale = viewRange === 'week' ? 0.9 : viewRange === 'month' ? 0.65 : 0.35;
-  const cameraZ = viewRange === 'week' ? 20 : viewRange === 'month' ? 22 : 35;
-  const canvasHeight = viewRange === 'week' ? '500px' : viewRange === 'month' ? '1200px' : '4000px';
+  const orbScale = viewRange === 'week' ? 0.9 : viewRange === 'month' ? 0.7 : 0.4;
+  const cameraZ = viewRange === 'week' ? 22 : viewRange === 'month' ? 25 : 40;
+  const canvasHeight = viewRange === 'week' ? '500px' : viewRange === 'month' ? '1000px' : '2500px';
 
   return (
     <div className={css.pageContent}>
@@ -173,7 +214,7 @@ function DashboardHistory() {
                 scale={orbScale} 
                 isAnimating={true}
                 position={[0,0,2]}
-                targetPosition={shelfDays[shelfDays.length - 1].position}
+                targetPosition={shelfDays.find(d => d.dateStr === new Date().toDateString())?.position || shelfDays[shelfDays.length - 1].position}
                 onAnimationComplete={() => setAnimatingIncoming(false)}
               />
             )
